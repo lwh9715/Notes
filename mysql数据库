@@ -1,0 +1,69 @@
+mysql数据库
+
+数据定义语言：DDL用来定义数据库的对象，数据库，表一类
+关键字：创建，修改，删除
+
+数据操作语言：DML用来对数据库中表的记录进行更新
+关键字：插入，删除，更新
+
+数据查询语言：DQL用来查询数据库中表的记录
+关键字：select，from，where
+
+数据控制语言：DCL用来定义数据库的访问权限和安全级别
+关键字：grand
+
+sql语句：
+#创建数据库：create database d_data
+#使用数据库：use d_data
+#查看正在使用的数据库: select database()
+#删除数据库：drop database d_data
+#查看数据库：show databases
+
+#创建表：create table t_user
+#查看表：show table t_user
+#查看表结构：desc t_user
+#删除表：delete table t_user
+#修改表（添加列）：alter table t_user add 列名
+#修改表（修改类型）：alter table t_user modify 列名
+#修改表（修改列名）：alter table t_user change 列名
+#修改表（删除列）：alter table t_user drop 列名
+#修改表名：rename table t_user to 新表名
+
+#插入记录：insert into 表 values（value，value...）
+#更新记录：update 表 set 字段名=value where 条件
+#删除记录：delete from 表 where 条件
+
+#查询所有商品：select * from 表
+#查询商品名和商品价格：select name，price form t_product
+#去掉重复值：select distinct value from t_user
+
+#条件查询：select * from t_user where id=value
+#所有商品价格的总数：select sum（price）from t_user
+#所有价格的平均数：select avg（price） from t_user
+#所有商品的个数：select count（*） from t_user
+
+#根据id字段分组后统计的商品个数：
+select id，count（*） from t_user group by id
+#根据id分组后统计每组商品的平均价格和平均价格大于60：
+select id，avg（*） from t_user group by id having avg（price）> 60
+
+#分页查询：select * from t_user where id limit 1，5
+#查询出两张表相同的字段数据：
+select * from t_user01 t_1 inner join t_user02 t_2 on t_1.id=t_2.id
+
+#复制表结构（不包括表数据）：create table new_user like t_table
+#复制表结构（包括表数据）：create table new_user select * from t_user
+
+#条件查询方法：
+select * from t_user where 条件表达式{说明：条件表达式可用and，or，not}
+投影查询方法：
+列出名scope重命名point，而id，name不变
+select id，scope point，name from t_user
+
+#按分数（scope）从低到高排序
+select * from t_user order by scope
+#按分数（scope）从高到低排序
+select * from t_user order by scope desc
+
+#连接查询方法：
+select * from t_user01 t_1 inner join t_user02 t_2 on t_1.id = t_2.id 

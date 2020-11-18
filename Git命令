@@ -1,0 +1,20 @@
+---git命令---
+
+#git add 文件名
+添加到暂存库中
+
+#git commit -am ‘说明’
+把暂存库中的暂存文件提交到本地仓库
+
+#git status 
+查看git文件的状态
+
+#git remote add 远程仓库地址.git
+操作远程仓库
+
+#git clone 远程仓库地址.git
+克隆整个远程仓库文件
+
+#git push origin（远程仓库分支） master
+推送本地仓库文件至远程仓库
+tips：需要本地仓库与远程仓库一致才能生效

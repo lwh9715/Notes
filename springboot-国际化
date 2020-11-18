@@ -1,0 +1,62 @@
+1)记录springboot学习遇到的坑坑洼洼
+
+
+ <a href="#" class="btn btn-sm" th:href="@{/index.html(l='zh_CN')}">中文</a>
+ <a href="#" class="btn btn-sm" th:href="@{/index.html(l='en_US')}">English</a>
+
+ 注意：在login.html文件中需要写成index.html或者其他，
+ 写login.html的话不能直接进去，只有通过重定向的方式才可以。
+ （报404错误的原因）
+
+	
+2）新的解决办法，分四步
+/**
+ * 可以在连接上携带区域信息
+ * 国际化
+ */
+public class MyLocaleResolver implements LocaleResolver {
+
+    @Override
+    public Locale resolveLocale(HttpServletRequest httpServletRequest) {
+        String paramLanguage = httpServletRequest.getParameter("lang");
+        if(!StringUtils.isEmpty(paramLanguage)){
+            String[] splits = paramLanguage.split("-");
+            return new Locale(splits[0], splits[1]);
+        }else{
+            String acceptLanguage = httpServletRequest.getHeader("Accept-Language").split(",")[0];
+            String[] splits = acceptLanguage.split("-");
+            return new Locale(splits[0], splits[1]);
+        }
+        // 如果想使用当前系统的语言，则使用Locale.getDefault()
+    }
+
+    @Override
+    public void setLocale(HttpServletRequest request, HttpServletResponse response, Locale locale) {
+
+    }
+	
+/*
+    *国际化区域转换
+    * */
+    @Bean
+    public LocaleResolver localeResolver() {
+        SessionLocaleResolver slr = new SessionLocaleResolver();
+        slr.setDefaultLocale(Locale.US);
+        return slr;
+    }
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        return lci;
+    }
+    //注册拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        //国际化这行很关键
+        registry.addInterceptor(localeChangeInterceptor());
+        registry.addInterceptor(new LoginHandlerInterceptor()).addPathPatterns("/**").
+                excludePathPatterns("/","/index.html","/druid","/index/sign","/customer**",
+                        "/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg",
+                        "/**/*.jpeg", "/**/*.gif", "/**/fonts/*", "/**/*.svg");
+    }

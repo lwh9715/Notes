@@ -1,0 +1,136 @@
+springboot-redis
+
+1）导入redis依赖
+<!--引入redis缓存依赖-->
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-cache</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-data-redis</artifactId>
+</dependency>
+<dependency>
+	<groupId>org.apache.commons</groupId>
+	<artifactId>commons-pool2</artifactId>
+</dependency>
+
+
+2）在application配置文件
+  redis:
+    host: 192.168.43.**
+	
+	
+
+3）创建redisConfig配置类并开启@EnableCaching // 开启缓存支持
+
+@Configuration
+@EnableCaching // 开启缓存支持
+public class RedisConfig extends CachingConfigurerSupport {
+    @Resource
+    private LettuceConnectionFactory lettuceConnectionFactory;
+
+    /**
+     * 配置CacheManager
+     *
+     * @return
+     */
+    @Bean
+    public CacheManager cacheManager() {
+        RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+
+        //解决查询缓存转换异常的问题
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        //om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);enableDefaultTyping方法过期了
+        om.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.WRAPPER_ARRAY);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
+
+        // 配置序列化（解决乱码的问题）
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+			  //.entryTtl(Duration.ZERO)
+                .entryTtl(Duration.ofSeconds(20))   //设置缓存失效时间
+                .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
+                .disableCachingNullValues();
+
+        RedisCacheManager cacheManager = RedisCacheManager.builder(lettuceConnectionFactory)
+                .cacheDefaults(config)
+                .build();
+        return cacheManager;
+    }
+
+    /**
+     * RedisTemplate配置
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+        // 设置序列化
+        Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(
+                Object.class);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        //om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);enableDefaultTyping方法过期了
+        om.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL,
+                JsonTypeInfo.As.WRAPPER_ARRAY);
+        jackson2JsonRedisSerializer.setObjectMapper(om);
+        // 配置redisTemplate
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<String, Object>();
+        redisTemplate.setConnectionFactory(lettuceConnectionFactory);
+        RedisSerializer<?> stringSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);// key序列化
+        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);// value序列化
+        redisTemplate.setHashKeySerializer(stringSerializer);// Hash key序列化
+        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);// Hash value序列化
+        redisTemplate.afterPropertiesSet();
+        return redisTemplate;
+    }
+	
+4）在controller或者service层配置缓存
+
+@CacheConfig(cacheNames = "student_id")  //这个注解表示类中共同放入到act 模块中
+
+	/**
+     * @return
+     * @throws Exception
+     * @Cacheable 1、先查缓存，
+     * 2、若没有缓存，就执行方法
+     * 3、若有缓存。则返回，不执行方法
+     * <p>
+     * 所以@Cacheable 不能使用result
+     */
+	 @Cacheable(key = "#root.methodName")
+	 
+	 /**
+     * @param
+     * @return
+     * @throws Exception
+     * @CachePut 更新并刷新缓存
+     * 1、先调用目标方法
+     * 2、把结果缓存
+     */
+	  @CachePut(key = "#result.id", unless = "#result.id == null")
+	 
+	 /**
+	 * CacheEvict
+     * 删除指定key 的缓存
+     * beforeInvocation=false  缓存的清除是否在方法之前执行
+     * 默认是在方法之后执行
+     *
+     */
+	 @CacheEvict(key = "#id", beforeInvocation = true)
+	 
+	 
+	 /**
+     * 删除所有缓存
+     *
+     * @return
+     * @throws Exception
+     */
+	 @CacheEvict(allEntries = true)

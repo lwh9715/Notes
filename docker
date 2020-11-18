@@ -1,0 +1,113 @@
+直白概念：docker 指的是别人配置好容器copy成一个镜像
+
+检查linux内核版本
+
+uname -r
+
+1>docker安装命令：
+yum install docker
+
+2>启动docker
+systemctl start docker
+
+3>开机启动docker
+systemctl enable docker
+
+4>停止docker
+systemctl stop docker
+
+5>查看防火墙状态
+systemctl status firewalld.service
+
+6>开启防火墙
+systemctl start firewalld.service
+
+7>关闭防火墙
+systemctl stop firewalld.service
+
+8>禁用防火墙
+systemctl disable firewalld.service
+
+
+docker常用操作命令：
+
+9>docker镜像查询  说明:搜索docker hup库上的镜像
+docker search ***
+
+10>docker镜像安装
+docker pull ***
+
+11>docker镜像列表 说明:查看本地所有镜像
+docker images
+
+12>docker镜像删除  说明:删除指定的本地镜像
+docker rmi image-id
+
+docker容器操作命令：
+
+13>运行docker镜像容器  说明:--name 自定义容器名称 -d 后台运行
+docker run --name myname -d 镜像名
+
+14>查看运行中docker容器
+docker ps
+
+15>查看docker容器
+docker ps -a
+
+16>删除docker容器
+docker rm image-id
+
+17>停止运行中的docker容器
+docker stop image-id
+
+18>docker端口映射  说明:不配置端口映射外部无法访问docker端口服务
+
+docker run -d -p 3306:3306 image-id
+
+19>查看docker容器日志
+docker logs image-id
+
+20>启动mysql镜像  说明:有的镜像启动方法不一
+docker run --name mysql -e MYSQL_ROOT_PASSWORD:123456 -d image-id
+
+21>docker如何进入容器  说明:exec方式，终端时分开的，推荐
+docker exec -it image-id /bin/bash
+重置密码：
+ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'newpassword'
+
+22>如何使用docker运行springboot项目
+1）在 pom.xml-properties中添加 Docker 镜像名称：
+<docker.image.prefix>springboot</docker.image.prefix>
+2）plugins 中添加 Docker 构建插件：
+<!-- Docker maven plugin -->
+		<plugin>
+			<groupId>com.spotify</groupId>
+			<artifactId>docker-maven-plugin</artifactId>
+			<version>1.0.0</version>
+			<configuration>
+				<imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+				<dockerDirectory>src/main/docker</dockerDirectory>
+				<resources>
+					<resource>
+						<targetPath>/</targetPath>
+						<directory>${project.build.directory}</directory>
+						<include>${project.build.finalName}.jar</include>
+					</resource>
+				</resources>
+			</configuration>
+		</plugin>
+		<!-- Docker maven plugin -->
+3）在目录src/main/docker下创建 Dockerfile 文件，Dockerfile 文件用来说明如何来构建镜像
+FROM openjdk:8-jdk-alpine
+VOLUME /tmp
+ADD springboot项目名.jar app.jar
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+4）在linux安装好jdk和maven，然后将springboot项目拷贝服务器中，进入项目路径下进行打包测试
+#打包
+mvn package
+#启动
+java -jar target/spring-boot-docker-1.0.jar
+#使用 DockerFile 构建镜像
+mvn package docker:build
+#运行镜像
+docker run -p 8080:8080 -d springboot镜像

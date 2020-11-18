@@ -1,0 +1,2 @@
+@Controller//表明这是一个SpringMVC的Controller
+@Configuration//通过注解表明该类是一个spring配置，相当于一个xml文件
