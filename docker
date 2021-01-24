@@ -75,7 +75,9 @@ docker exec -it image-id /bin/bash
 重置密码：
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'newpassword'
 
+
 22>如何使用docker运行springboot项目
+
 1）在 pom.xml-properties中添加 Docker 镜像名称：
 <docker.image.prefix>springboot</docker.image.prefix>
 2）plugins 中添加 Docker 构建插件：
@@ -97,11 +99,13 @@ ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'newpassword'
 			</configuration>
 		</plugin>
 		<!-- Docker maven plugin -->
+
 3）在目录src/main/docker下创建 Dockerfile 文件，Dockerfile 文件用来说明如何来构建镜像
 FROM openjdk:8-jdk-alpine
 VOLUME /tmp
 ADD springboot项目名.jar app.jar
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+
 4）在linux安装好jdk和maven，然后将springboot项目拷贝服务器中，进入项目路径下进行打包测试
 #打包
 mvn package
@@ -111,3 +115,15 @@ java -jar target/spring-boot-docker-1.0.jar
 mvn package docker:build
 #运行镜像
 docker run -p 8080:8080 -d springboot镜像
+
+23）将主机/www/runoob目录拷贝到容器96f7f14e99ab的/www目录下
+
+docker cp /www/runoob 96f7f14e99ab:/www/
+
+24）将容器96f7f14e99ab的/www目录拷贝到主机的/tmp目录中
+
+docker cp  96f7f14e99ab:/www /tmp/
+
+25）docker exec -it 容器id /bin/bash后，vim命令用不了
+# apt-get update   同步 /etc/apt/sources.list 和 /etc/apt/sources.list.d 中列出的源的索引
+# apt-get install vim 安装vim命令

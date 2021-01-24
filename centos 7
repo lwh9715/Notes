@@ -66,4 +66,12 @@ nohup ./start.sh 运行，停止的话直接kill就行
 
 执行nohup java -jar do_iptable.jar >/dev/null  & 运行jar会提示：nohup: 忽略输入重定向错误到标准输出端
 
-修改运行方式为nohup java -jar do_iptable.jar >/dev/null 2>&1 &即可
+修改运行方式为nohup java -jar do_iptable.jar >/dev/null 2>&1 & 即可
+
+
+系统时钟和硬件时钟同步：
+# hwclock --systohc或者# clock --systohc  即用系统时钟同步硬件时钟
+
+
+
+-Dfile.encoding=utf-8

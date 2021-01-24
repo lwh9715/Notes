@@ -1,0 +1,62 @@
+crontab命令
+
+1）crontab命令常见于Unix和类Unix 的操作系统之中，用于设置周期性被执行的指令。
+该命令从标准输入设备读取指令，并将其存放于“crontab”文件中，以供之后读取和执行。
+crontab储存的指令被守护进程激活， crond常常在后台运行，每一分钟检查是否有预定的作业需要执行。
+这类作业一般称为cron jobs。
+
+/var/spool/cron/ 目录下存放的是每个用户包括root的crontab任务，每个任务以创建者的名字命名
+/etc/crontab 这个文件负责调度各种管理和维护任务。
+/etc/cron.d/ 这个目录用来存放任何要执行的crontab文件或脚本。
+
+
+2）确定服务器是否开启定时任务计划服务
+命令: service crond status 确认定时任务是否开启
+命令: service crond start 开启服务
+命令: service crond stop 关闭服务
+命令: service crond restart 重启服务
+命令: service crond reload 重新载入配置
+
+
+3）crontab格式说明（* * * * *）
+解释				含义								取值范围
+minute 			每个小时的第几分钟执行该任务			0~59
+hour			每天的第几个小时执行该任务				0~23
+day of mouth	每月的第几天执行该任务					1~31
+month of year	每年的第几个月执行该任务				1~12
+day of week		每周的第几天执行该任务 					0~6(0表示周天)
+
+* 取值范围内的所有数字
+/ 每过多少个数字
+- 从X到Z
+，散列数字
+
+
+示例:
+* * * * * myCommand								每1分钟执行一次myCommand
+5 * * * * Command                       		每小时的第5分钟执行一次命令
+30 18 * * * Command                     		指定每天下午的 6:30 执行一次命令 
+30 7 8 * * Command                      		指定每月8号的7：30分执行一次命令 
+30 5 8 6 * Command                      		指定每年的6月8日5：30执行一次命令 
+30 6 * * 0 Command                      		指定每星期日的6:30执行一次命令
+5，15，25，35，45，55 16，17，18 * * * Command	每天的下午4点、5点、6点的5 min、15 min、25 min、35 min、45 min、55 min时执行命令。 
+0,30 18-23 * * * /etc/init.d/smb restart		每天18 : 00至23 : 00之间每隔30分钟重启smb
+* */1 * * * /etc/init.d/smb restart				每一小时重启smb
+
+
+4）开始创建一个定时任务
+命令：crontab -e  编辑某个用户的cron服务
+命令：crontab -l 列出某个用户cron服务的详细内容
+命令：crontab -r 删除某个用户的cron服务(慎用)
+
+
+5）查看定时任务的执行情况
+username:用户
+在/var/spool/mail/{username}   中可以查看最近的crontab的执行情况
+
+
+6）cron的定时任务备份恢复
+如果使用crontab -r 误删了定时任务  在/var/spool/cron下有定时任务的备份.可以通过该cron找回
+如果没有权限 的话   su - + root.password    在root用户下 进行查看
+	 	 	 	 	
+					
