@@ -75,3 +75,34 @@ nohup ./start.sh 运行，停止的话直接kill就行
 
 
 -Dfile.encoding=utf-8
+
+
+Linux防火墙开放某端口号:
+
+#安装防火墙
+yum install firewalld systemd -y
+
+#查看已经开放的端口
+firewall-cmd --list-ports
+
+#开放端口
+firewall-cmd --zone=public --add-port=8088/tcp --permanent
+
+#关闭端口
+firewall-cmd --zone=public --remove-port=8088/tcp --permanent 
+
+
+#重启防火墙
+systemctl reload firewalld
+
+
+#查看防火墙状态
+systemctl status firewalld
+
+
+#开启防火墙
+systemctl start firewalld
+
+
+#关闭防火墙
+systemctl stop firewalld

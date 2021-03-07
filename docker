@@ -62,13 +62,13 @@ docker stop image-id
 
 18>docker端口映射  说明:不配置端口映射外部无法访问docker端口服务
 
-docker run -d -p 3306:3306 image-id
+docker run -d -p 3306:3306 --name mysql mysql
 
 19>查看docker容器日志
 docker logs image-id
 
 20>启动mysql镜像  说明:有的镜像启动方法不一
-docker run --name mysql -e MYSQL_ROOT_PASSWORD:123456 -d image-id
+docker run --name mysql -e MYSQL_ROOT_PASSWORD:123456 -d -p 3306:3306 mysql
 
 21>docker如何进入容器  说明:exec方式，终端时分开的，推荐
 docker exec -it image-id /bin/bash
