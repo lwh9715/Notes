@@ -18,3 +18,11 @@
 #git push origin（远程仓库分支） master
 推送本地仓库文件至远程仓库
 tips：需要本地仓库与远程仓库一致才能生效
+
+
+#git pull origin master
+取回 origin/master 分支，再与本地的 brantest 分支合并
+git pull <远程主机名> <远程分支名>:<本地分支名>
+
+#git remote -v
+查看信息
