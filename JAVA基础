@@ -18,3 +18,9 @@ return是结束方法，break是跳出循环，continue是终止本次循环继�
 5）==和equals的区别
 ==是判断两个变量或者实例是不是指向同一个内存地址
 equals是判断两个变量或者实例的内存空间值，即内容进行比较
+
+
+类型转换：
+AVA 将 STRING类型与LIST类型相互转换
+string转化为list：list = Arrays.asList(str);
+list转化为string：str=String.join(",", list);
