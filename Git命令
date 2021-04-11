@@ -26,3 +26,8 @@ git pull <远程主机名> <远程分支名>:<本地分支名>
 
 #git remote -v
 查看信息
+
+#设置ssh密钥
+ssh-keygen -t rsa -C "lwh768561@gmail.com"
+#查看密钥
+cat ~/.ssh/id_rsa.pub
