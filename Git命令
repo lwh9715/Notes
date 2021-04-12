@@ -27,6 +27,12 @@ git pull <远程主机名> <远程分支名>:<本地分支名>
 #git remote -v
 查看信息
 
+# 配置用户名
+git config --global user.name "xxx"
+
+# 配置邮件
+git config --global user.email "xxx@xxx.com"
+
 #设置ssh密钥
 ssh-keygen -t rsa -C "lwh768561@gmail.com"
 #查看密钥
