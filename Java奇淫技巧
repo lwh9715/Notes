@@ -1,0 +1,96 @@
+StringUtils
+.isEmpty 没有忽略空格参数，是以是否为空和是否存在为判断依据。
+isBlank 是在 isEmpty 的基础上进行了为空（字符串都为空格、制表符、tab 的情况）的判断。（一般更为常用）
+
+/**
+* 附件集合
+*/
+@Transient
+private List<SysFile>  fileList;
+
+返回多表查询数据
+
+
+ System.currentTimeMillis(); 系统当前时间
+
+
+//判断字符串是否仅为数字
+public static boolean isNumeric(String str){
+    Pattern pattern = Pattern.compile("[0-9]*");
+    return pattern.matcher(str).matches();
+
+}
+//判断是否为汉字
+public boolean isCharacters (String name){
+    int n = 0;
+    for (int i = 0; i < name.length(); i++) {
+        n = (int) name.charAt(i);
+        if (!(19968 <= n && n < 40869)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+
+#关于String s="1.0" 转为INT
+
+String s="1.0";
+当需要存入INT类型时
+需要将其转为DOUBLE在调用MATH.CEIL
+Double f = Double.valueOf(s);
+Int a = (int)Math.ceil(f);
+
+
+
+Collections.shuffle(User);
+将list数据打乱
+
+
+此处补充知识点：
+关于***定时器@Scheduled(cron = "0 0/1 * * * ?")问题：
+举几个例子: 
+每隔5秒执行一次："*/5 * * * * ?"
+每隔1分钟执行一次："0 */1 * * * ?"
+每天23点执行一次："0 0 23 * * ?"
+每天凌晨1点执行一次："0 0 1 * * ?"
+每月1号凌晨1点执行一次："0 0 1 1 * ?"
+每月最后一天23点执行一次："0 0 23 L * ?"
+每周星期天凌晨1点实行一次："0 0 1 ? * L"
+在26分、29分、33分执行一次："0 26,29,33 * * * ?"
+每天的0点、13点、18点、21点都执行一次："0 0 0,13,18,21 * * ?"
+表示在每月的1日的凌晨2点调度任务："0 0 2 1 * ? *"
+表示周一到周五每天上午10：15执行作业："0 15 10 ? * MON-FRI" 
+表示2002-2006年的每个月的最后一个星期五上午10:15执行："0 15 10 ? 6L 2002-2006"***
+
+
+
+
+long before=System.currentTimeMillis();
+
+System.out.println("加密用时："+(System.currentTimeMillis()-before));
+
+
+
+
+Map<String, Object> map = new HashMap<>();
+map.put("type",0);
+map.put("name",0);
+map.put("birthday",0);
+map.put("id_number",0);
+for (int i = 0; i < split.length; i++) {
+String s = split[i].replace("{","").replace("}","").replaceAll("\"","");
+String[] split1 = s.split(":",-1);
+if (split1[1] == null || split1[1].equals("")) {
+    continue;
+}
+String key = split1[0];
+String value = split1[1];
+if (map.get(key) != null) {
+    map.put(key,value);
+}
+}
+
+解决split分割空值不能得到的问题，在切割后边加上-1即可
+String[] split1 = s.split(":",-1);
