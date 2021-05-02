@@ -8,15 +8,15 @@ redis的常用命令主要分为两个方面、一个是键值相关命令、一
 
       del name 删除key name
 
-      expire confirm 100 设置confirm这个key100秒过期
+      expire name 100 设置name这个key100秒过期
 
-      ttl confirm 获取confirm 这个key的有效时长
+      ttl name 获取confirm 这个key的有效时长
 
-      select 0 选择到0数据库 redis默认的数据库是0~15一共16个数据库
+      select 0 选择到0数据库 redis默认的数据库是0~15一共16个数据库(切换数据库（默认16个数据库）)
 
-      move confirm 1 将当前数据库中的key移动到其他的数据库中，这里就是把confire这个key从当前数据库中移动到1中
+      move name 1 将当前数据库中的key移动到其他的数据库中，这里就是把name这个key从当前数据库中移动到1中
 
-      persist confirm 移除confirm这个key的过期时间
+      persist name 移除name这个key的过期时间
 
       randomkey 随机返回数据库里面的一个key
 
@@ -42,4 +42,71 @@ redis的常用命令主要分为两个方面、一个是键值相关命令、一
 
       flushdb 删除当前选择数据库中的所有key
 
-      flushall 删除所有数据库中的数据库
+      flushall 删除所有数据库中的数据
+
+
+
+3）redis性能测试（benchmark是一个压力测试工具）
+
+redis-benchmark -h localhost -p 6379 -c 100 -n 100000
+
+
+4)redis 五大数据类型
+
+（1）string
+#追加字符串,如果name不存在，就相当于set一个name
+appen name 'hello'
+
+#获取字符串的长度
+strlen name
+
+#自增
+incr name 
+
+#自减
+decr name
+
+#设置步长（增）
+incrby name 10
+
+#设置步长（减）
+decrby name 10
+
+#字符串范围（相当于Java的substring用法）0到-1表示取所有
+getrange name 0 -1
+
+#替换（替换指定位置开始的字符串）
+setrange name 1 xxx
+
+#设置过期时间
+setex（set with expire）
+setex name 30 "Liang WenHui"
+
+#不存在再进行设置,如果name存在,创建失败（分布式锁中常使用）
+setnx（set if not exist）
+setnx name "redis"
+
+#同时设置多个值
+mset name1 key1 name2 key2 name3 key3
+
+#同时获取多个值
+mget name1 name2 name3
+
+#对象(设置一个name：1对象 值为json字符来保存一个对象)
+set name：1{name：zhangsan,age:24}
+
+mset name:1:name zhangsan name:1:age 24
+
+
+
+（2）list
+（3）set
+（4）hash
+（5）zset
+
+5）三种特殊数据类型
+
+geospatial
+hyperloglog
+bigmaps
+
