@@ -23,6 +23,7 @@ redis的常用命令主要分为两个方面、一个是键值相关命令、一
       rename key2 key3 重命名key2 为key3
 
       type key2 返回key的数据类型
+      
 
 2、服务器相关命令
 
@@ -43,7 +44,6 @@ redis的常用命令主要分为两个方面、一个是键值相关命令、一
       flushdb 删除当前选择数据库中的所有key
 
       flushall 删除所有数据库中的数据
-
 
 
 3）redis性能测试（benchmark是一个压力测试工具）
@@ -98,10 +98,119 @@ set name：1{name：zhangsan,age:24}
 mset name:1:name zhangsan name:1:age 24
 
 
-
 （2）list
-（3）set
+
+#将一个或者多个值，插入到列表头部（左）
+lpush name "zhangsan"
+
+#获取list中的值
+lrange name 0 -1 （0到-1表示列出所有）
+lrange name 0 3 （0到3表示通过区间获取值）
+
+
+将一个或者多个值，插入到列表头部（右）
+rpush name "zhangsan"
+
+
+#移除list集合中第一个元素（lpop）
+lpop name
+
+#移除list集合中最后一个元素（rpop）
+rpop name
+
+#通过下标获取list集合中的某一个元素
+lindex name 3
+
+#返回列表长度
+llen name
+
+#移除list集合中指定个数的value，精准匹配
+lrem name count value
+
+#通过下标截取指定的长度，并list已经被改变（截断了只剩下的部分）
+ltrim name 0 3
+
+#移除列表中最后一个元素，并移动到新的列表中（lpoplpush 组合命令）
+rpoplpush name name1
+
+#将列表中指定下标的值替换为另外一个值，更新操作
+lset name 0 zhangsan（如果不存在列表更新会报错）
+
+#将某个具体的value插入列表指定的元素中前面或者后面
+linsert name after zhangshan lisi
+or
+linsert name before zhangshan lisi
+
+（3）set (set中的值不能重读的)
+
+#set集合中添加元素
+sadd name "zhangsan"
+
+#查看指定set中的所有值
+SMEMBERS name
+
+#判断某一个值是不是在set集合中
+SISMEMBER name "zhangsan"
+
+#获取set集合中内容元素的个数
+scard name
+
+#移除set集合中的指定元素
+srem name "zhangsan"
+
+#无需不重复集合，抽随机
+srandmember name
+
+#随机删除key
+spop name
+
+#将一个指定的值，移动到另一个set集合中
+smove name name1 key（这里的key指的是name的值）
+
+#差集
+sdiff name name1
+
+#交集（共同关注）
+sinter name name1
+
+#并集
+sunion name name1
+
+PS：功能点推荐，类似微博共同好友，推荐好友！
+
 （4）hash
+
+#set一个集体的key-value
+hset name filed zhangsan
+
+#获取一个字段
+hget name filed
+
+#set多个具体的key-value
+hmset name filed1 zhangsan field2 lisi
+
+#获取多个字段
+hmget name filed1 filed2
+
+#获取全部数据
+hgetall name
+
+#删除hash指定的key字段，对应的value值也就消失了
+hdel name filed
+
+#获取hash表的字段数量
+hlen name
+
+#判断hash中指定字段是否存在
+hexists name filed
+
+#只获取所有的filed
+hkeys name
+
+#只获取所有的value
+hvals name
+
+
 （5）zset
 
 5）三种特殊数据类型
