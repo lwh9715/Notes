@@ -213,9 +213,50 @@ hvals name
 
 （5）zset
 
-5）三种特殊数据类型
 
-geospatial
+三种特殊数据类型
+
 hyperloglog
 bigmaps
+
+
+1）geospatial
+有效经纬度：
+经度：-180 ~ 180
+纬度：-85.05 ~ 85.05
+
+#添加地理位置（geoadd）
+geoadd china：city 116.40 39.90 beijing
+
+geodist（两点之间的距离）查看北京到深圳的直线距离
+m 表示单位为米
+km 表示单位为千米
+mi 表示单位为英里
+ft 表示单位为英尺
+geodist china：city beijing shenzhen km 
+
+geohash(返回一个或多个位置元素的geohash标识)
+该命令将返回11个字符的geohash字符串
+#将二维的经纬度转换为一维的字符串，如果两个字符串接近，那么则距离越近
+geohash china：city beijing shenzhen
+
+#获取指定的城市经度纬度（geopos）获取当前定位，一定是一个坐标值
+geopos china：city beijing
+
+georadius（以给定的经度纬度为中心，找出某一般半径内的元素）
+例如：我附近的人？（获取所有附近的人的地址，定位）通过半径来查询！
+获取指定数量的人 200？
+#以100 30为经纬度中心，寻找方圆1000km内的城市
+georadius  china:city 110 30 1000 km
+
+#显示他人的定位信息
+georadius china：city 100 30 500 km withcoord 
+
+
+#筛选出来的指定结果
+georadius china：city 100 30 500 km withcoord count 1
+
+
+georadiusbymember（找出位于指定元素周围的其它元素）
+georadiusbymember china:city shenzhen 500 km
 
