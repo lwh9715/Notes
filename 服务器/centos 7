@@ -1,7 +1,5 @@
 centos 7 乱码解决
 
-
-
 1）查看系统是否安装了中文安装包
 locale -a |grep "zh_CN"
 
@@ -51,8 +49,6 @@ LC_IDENTIFICATION：对locale自身包含信息的概述
 
 LC_ALL：优先级最高变量，若设置了此变量，所有LC_* 和LANG变量会强制跟随它的值
 
-
-
 4）linux运行springboot项目
 
 在springboot的maven功能下（install）打包jar包
@@ -61,21 +57,16 @@ LC_ALL：优先级最高变量，若设置了此变量，所有LC_* 和LANG变�
 编辑一个文件（vim start.sh）java -jar ***.java >/dev/null 2>&1 &
 nohup ./start.sh 运行，停止的话直接kill就行
 
-
 执行nohup java -jar do_iptable.jar & 运行jar会提示：nohup: 忽略输入并把输出追加到"nohup.out"
 
 执行nohup java -jar do_iptable.jar >/dev/null  & 运行jar会提示：nohup: 忽略输入重定向错误到标准输出端
 
 修改运行方式为nohup java -jar do_iptable.jar >/dev/null 2>&1 & 即可
 
-
 系统时钟和硬件时钟同步：
 # hwclock --systohc或者# clock --systohc  即用系统时钟同步硬件时钟
 
-
-
 -Dfile.encoding=utf-8
-
 
 Linux防火墙开放某端口号:
 
@@ -91,24 +82,18 @@ firewall-cmd --zone=public --add-port=8088/tcp --permanent
 #关闭端口
 firewall-cmd --zone=public --remove-port=8088/tcp --permanent 
 
-
 #重启防火墙
 systemctl reload firewalld
-
 
 #查看防火墙状态
 systemctl status firewalld
 
-
 #开启防火墙
 systemctl start firewalld
-
 
 #关闭防火墙
 systemctl stop firewalld
 
-
-<<<<<<< HEAD
 #查看防火墙是否开放端口
 firewall-cmd --query-port=27017/tcp
 
