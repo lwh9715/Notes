@@ -213,6 +213,15 @@ hvals name
 
 （5）zset
 
+#添加一个值
+zadd name zhangsan
+
+#添加多个值
+zadd name1 zhangsan name2 lisi
+
+#遍历
+zrange name 0 -1
+
 5）三种特殊数据类型
 
 geospatial

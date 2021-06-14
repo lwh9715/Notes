@@ -1,0 +1,272 @@
+MongoDB
+
+1)Windows 环境启动mongodb
+
+1、命令启动
+在mongodb解压包下bin目录打开cmd窗口输入命令： mongod --dbpath=..\data\db
+
+2、配置文件启动
+在mongodb解压包bin同级目录创建config目录新建mongod.conf文件,内容如下
+storage:
+  dbPath: E:\MongoDB\mongodb-windows-x86_64-4.4.6\mongodb-win32-x86_64-windows-4.4.6\data\db
+
+输入命令：mongod -f ..\config\mongod.conf
+
+Ps:调试是使用命令启动,上线时使用配置文件
+
+
+2）Linux 环境启动mongodb
+
+1、上传或直接Linux服务器上下载mongodb文件,解压,新建两个目录分别存储数据和日志
+#数据存储目录
+mkdir -p /mongodb/single/data/db
+#日志存储目录
+mkdir -p /mongodb/single/log
+新建并修改配置文件
+vi /mongodb/single/mongod.conf
+
+mongod.conf内容如下
+systemLog:
+   #MongoDB发送所有日志输出的目标指定为文件
+   destination: file
+   #MongoDB或mongos应向其发送所有诊断日志记录信息的日志文件路径
+   path: "/var/log/mongodb/mongod.log"
+   #当mongoDB或Mongod实例重新启动时,mongodb或mongod会将新条目附加到现有的日志文件末尾
+   logAppend: true
+storage:
+   #启用后或禁用持久性日志以确保数据文件保持有效和可恢复
+   dbPath: "/var/log/mongodb/mongod.log"
+   journal:
+      enabled: true
+processManagement:
+   #启用在后台运行的mongos或mongod进程的守护进程模式
+   fork: true
+net:
+   #服务实例绑定的IP,默认时localhost
+   bindIp: 127.0.0.1
+   #绑定的端口,默认27017
+   port: 27017
+setParameter:
+   enableLocalhostAuthBypass: false
+
+
+启动MongoDB服务命令:
+/usr/local/mongodb/bin/mongod -f /mongodb/single/mongod.conf
+
+注意：如果远程连接不上,需要配置防火墙放行
+
+#登录mongodb
+./mongo --port 27017
+
+#账户认证
+db.auth('root','liangwenhui')
+
+ #创建账户
+db.createUser({user: "root",pwd: "123456",roles: [ { role: "root", db: "admin" } ]})
+
+ Tip：
+1.数据库用户角色：read、readWrite;
+2.数据库管理角色：dbAdmin、dbOwner、userAdmin；
+3.集群管理角色：clusterAdmin、clusterManager、clusterMonitor、hostManager；
+4.备份恢复角色：backup、restore
+5.所有数据库角色：readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase
+6.超级用户角色：root
+
+ #查看用户
+ show users
+
+
+停止关服务（两种方式）：
+1、直接kill -9 进程号
+2、标准关闭方式
+#客户端登录服务
+mongo --port 27017
+#切换到admin库
+use admin
+#关闭服务
+db.shutdownServer()
+
+
+3）mongoDB 命令
+
+#切换使用数据库,如果数据库不存在则创建mongodb数据库
+use articledb
+
+#查看有权限查看的所有数据库命令
+show dbs
+或
+show databases
+
+#查看当前正在使用的数据库命令
+db
+
+#MongoDB删除数据库的语法
+db.dropDatabase()
+
+Tip:主要用于删除已经持久化的数据库
+
+4）集合操作
+
+#集合的显式创建
+db.createCollection("helloMongoDB")
+
+#查看集合
+show collections
+
+#集合删除
+db.collection.drop()
+或
+db.集合名称.drop()
+
+#集合的隐式创建
+
+#文档的插入(单条数据)
+使用insert() 或 save()方法向集合中插入文档
+
+示例：
+向comment的集合中插入一条数据：
+db.comment.insert({
+   articleId:"001",
+   content:"李光耀自传",
+   userId:"lwx768561",
+   state:"1"
+})
+
+Tip:
+1）comment集合如果不存在会被自动隐式创建
+2）mongodb中的数字默认情况下是double类型,如果要存整形,必须使用函数NumberInt(整数数字),否则取出来的值有问题。
+3）插入当前时间使用new Date()
+4)插入的数据没有指定_id,会自动生成主键值
+5）如果某字段没有值,可以赋值为null,或不写该字段
+
+#文档的插入(多条数据)
+db.collection.insertMany([
+{articleId:"001",content:"李光耀自传",userId:"lwx768561",state:"1"},
+{articleId:"002",content:"默克尔自传",userId:"lwx768562",state:"1"},
+{articleId:"003",content:"普京自传",userId:"lwx768563",state:"1"}
+])
+
+Tip:
+1）插入時指定了_id,則主鍵就是該值
+2）如果某条数据插入失败,将会终止插入,但已经插入成功的数据不会回滚掉
+3）因为批量插入由于数据较多原因容易出现和失败,因此,可以使用try catch进行异常捕捉处理
+
+#查询所有
+db.集合名称.find()
+或
+db.集合名称.find({})
+
+#投影查询(不显示所有字段,只显示指定的字段)
+
+#查询结果只显示_id,userid,nickname
+db.comment.find({userid:"001"},{userid:1,nickname:1})
+
+Tip:默认_id会显示
+
+#查询结果只显示userid,nickname,不显示_id
+db.comment.find({userid:"001"0},{userid:1,nickname:1,_id:0})
+
+#查询所有数据,但只显示_id,userid,nickname
+db.comment.find({},{userid:1,nickname:1})
+
+#文档更新
+
+
+1）覆盖式的修改
+
+#修改_id为1的记录,点赞数为1001
+db.comment.update({_id:"1"},{likenum:NumberInt(1001)})
+
+Tip:执行之后,这条文档除了likenum字段其他的字段都不见了
+
+2)局部修改
+
+#修改_id为2的记录,浏览量为889
+db.comment.update({_id:"2"},{$set:{likenum:NumberInt(889)}})
+
+3)批量修改
+
+#更新所有用户为1003用户的名称为凯撒大帝
+//默认只修改第一条数据
+db.comment.update({userid:"1003"},{$set:{nickname:"凯撒大帝"}})
+//修改所有符合条件的数据
+db.comment.update({userid:"1003"},{$set:{nickname:"凯撒大帝"}},{multi:true})
+
+Tip:如果不加后面的参数(multi:true),则只更新符合条件的第一条记录
+
+4)列值增长的修改($inc 运算符 在原有值的基础上增加或减少)
+
+#对3号数据的点赞数,每次递增1
+db.comment.update({_id:"3"},{$inc:{likenum:NumberInt(1)}})
+
+5)文档删除
+
+#删除文档的语法结构
+db.集合名称.remove(条件)
+
+#删除全部数据
+db.comment.remove({})
+
+#删除_id=1的记录
+db.comment.remove({_id:"1"})
+
+#文档的分页统计
+
+1）统计集合的所有记录
+db.comment.count()
+
+2)按条件统计记录
+db.comment.count({userid:"1003"})
+
+#分页列表查询
+
+1)返回指定条数记录,在find方法后调用limit来返回结果(TopN),不设值默认值20
+db.comment.find().limit(3)
+
+2）skip方法同样接受一个数字参数作为跳过的记录条数(前N个不要),默认值是0
+db.comment.find().skip()
+
+3)每页两条,第二页开始跳过前两条数据接着值显示3和4的数据
+db.comment.find().skip(0).limit(2)
+db.comment.find().skip(2).limit(2)
+db.comment.find().skip(4).limit(2)
+
+
+#排序查询
+sort()方法对数据进行排序,sort()方法可以通过参数指定排序的字段,并使用1和-1来指定排序的方式,其中1为升序,而-1是用于降序排列
+
+#对userid降序排列,并对访问量进行升序排列
+db.comment.find().sort({userid:-1,likenum:1})
+
+Tip:skip(),limit(),sort()三个放在一起执行时,执行的顺序先sort()>skip()>limit(),和命令编写顺序无关
+
+
+6）正则表达式的复杂条件查询
+
+#查询评论内容包含"开水"的所有文档
+db.comment.find({content:/开水/})
+
+#查询评论内容中以"专家"开头的
+db.comment.find({content:/^专家/})
+
+
+7)比较查询($gt 等价于 大于,$lt 等价于 小于,$gte 等价于 大于等于,$lte 等价于 小于等于,$ne 等价于 不等于)
+
+#查询评论点赞数大于700的记录
+db.comment.find({likenum:{$gt:NumberInt(700)}})
+
+8)包含查询($in 等价于 包含,$nin 等价于 不包含)
+
+#查询评论的集合中userid字段包含1003和1004的文档
+db.comment.find({userid:{$in:["1003","1004"]}})
+
+#查询评论的集合中userid字段不包含1003和1004的文档
+db.comment.find({userid:{$nin:["1003","1004"]}})
+
+9）条件连接查询($and:[{},{}] , $or:[{},{}])
+
+#查询评论数集合中likenum 大于等于700并且小于2000的文档
+db.comment.find({$and:[{likenum:【$gte:NumberInt(700)},{likenum:{$lt:NumberInt(2000)}}]})
+
+#查询评论数1集合中userid为1003,或者点赞数小于1000的文档记录
+db.comment.find({$or:[{userid:"1003"},{likenum:{$lt:1000}}]})
