@@ -108,8 +108,12 @@ systemctl start firewalld
 systemctl stop firewalld
 
 
+<<<<<<< HEAD
 #查看防火墙是否开放端口
 firewall-cmd --query-port=27017/tcp
 
 #添加需要开通的端口
 firewall-cmd --permanent --add-port=27017/tcp
+
+#获取本机ip
+curl ip.sb

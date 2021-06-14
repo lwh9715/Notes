@@ -1,0 +1,41 @@
+前后端：vue + springboot
+
+1) 导包
+
+2）编写config管理类，并启动swagger
+@Configguration
+@EnableSwagger2
+
+3）
+
+//配置了Swagger的Docket的bean实例
+//enable是否启动swagger，如果为FALSE，则swagger不能再浏览器访问
+@Bean
+public Docket docket(){
+
+//设置要显示的swagger环境
+Profiles profiles = Profiles.of("dev","text");
+//通过environment.acceptsProfiles()判断是否出在自己设定的环境当中
+Boolean flag = environment.acceptsProfiles(profiles)；
+//把flag赋值到enable中即可
+
+
+//RequestHandlerSelectors 配置要扫描接口的方式
+//basePackage:指定要扫描的包
+//any():扫描全部
+//none():不扫描
+//withClassAnnotation:扫描类上的注解，参数是一个注解的反射对象
+//withMethodAnnotation:扫描方法上的注解
+	return new Docket()apiInfo(apiInfo()).enable(flag).select().apis().build();
+}
+
+//配置swagger信息 apiInfo
+
+private ApiInfo apiInfo(){
+	return new ApiInfo();
+}
+
+
+4）
+类上使用Api(tags = "功能注释")
+方法则使用ApiOperation(value="方法注释")
