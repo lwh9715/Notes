@@ -1,0 +1,11 @@
+window
+
+
+1)查看进程占用
+netstat -ano |findstr 8088
+
+2）查看进程名称
+tasklist |findstr
+
+3）杀进程端口或名称
+taskkill /f /t /im
