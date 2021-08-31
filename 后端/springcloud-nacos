@@ -1,0 +1,91 @@
+springcloud-nacos
+
+
+Nacos的默认端口是8848，如果你电脑上的其它进程占用了8848端口，请先尝试关闭该进程
+
+1）windows单片机启动命令
+#startup.cmd -m standalone
+
+
+父工程引入依赖：
+
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+    <version>2.2.5.RELEASE</version>
+    <type>pom</type>
+    <scope>import</scope>
+</dependency>
+
+客户端引入依赖：
+
+<!-- nacos客户端依赖包 -->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+</dependency>
+
+application.yml配置文件配置
+spring:
+  application:
+    name: order-server
+  cloud:
+    nacos:
+      server-addr: localhost:8848
+
+
+Nacos服务分级存储模型
+1）一级是服务，例如user-serve
+2）二级是集群，例如杭州，上海
+3）三级是实例，例如杭州机房的某台部署了user-server的服务器
+
+如何设置实例的集群属性
+1）修改application.yml文件，添加spring.cloud.nacos.discovery.cluster-name属性
+
+
+NacosRule负载均衡策略
+
+1）优先选择同集群服务实例列表
+2）本地集群找不到提供者，才去其他集群寻找，并且会报警报
+3）确定了可用实例列表后，再采用随机负载均衡挑选实例
+
+
+Nacos注册中心-加权负载均衡
+
+实例的权重控制
+1）Nacos控制台可以设置的权重值，0~1之间
+2）同集群内的多个实例，权重越高被访问的频率越高
+3）权重设置为0时，则完全不会被访问
+
+ps：权重设置为0，通常使用与版本上线！灰度测试
+
+
+Nacos环境隔离
+
+1）namespace用来做环境隔离
+2）每隔namespace都有唯一的id
+3）不同的namespace下服务不可见
+
+
+临时实例和非临时实例
+
+服务注册到Nacos时，可以选择注册为临时实例或非临时实例，通过一下配置来设置
+
+spring:
+  cloud:
+    nacos:
+      discovery:
+        ephemeral: false #false为非临时实例
+
+
+Nacos和Eureka的共同点
+1）都支持服务注册和服务拉取
+2）都支持服务提供者心跳方式做健康检测
+
+Nacos和Eureka的区别
+1）Nacos支持服务端主动检测提供者状态，临时实例采用心跳模式，给临时实例采用主动检测模式
+2)临时实例心跳不正常会被剔除，非临时实例则不会被剔除
+3）Nacos支持服务列表变更的消息推送模式，服务列表更新更及时
+4）Nacos集群默认采用AP方式，当集群中存在非临时实例时，采用CP模式，Eureka采用AP方式
+
+ps：一般使用临时实例模式，非临时实例会加重服务器的性能消耗
