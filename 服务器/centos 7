@@ -102,3 +102,7 @@ firewall-cmd --permanent --add-port=27017/tcp
 
 #获取本机ip
 curl ip.sb
+
+
+#根据ps -ef | grep 进程名称查询具体Pid查看内存使用情况
+top -p Pid

@@ -89,3 +89,91 @@ Nacos和Eureka的区别
 4）Nacos集群默认采用AP方式，当集群中存在非临时实例时，采用CP模式，Eureka采用AP方式
 
 ps：一般使用临时实例模式，非临时实例会加重服务器的性能消耗
+
+
+2021/8/31
+
+一、Nacos配置管理
+
+Nacos除了可以做注册中心，同样可以做配置管理来使用。
+
+注意：项目的核心配置，需要热更新的配置才有放到nacos管理的必要。基本不会变更的一些配置还是保存在微服务本地比较好。
+
+
+1）首先，在userserver服务中，引入nacos-config的客户端依赖
+
+<!--nacos配置管理依赖-->
+<dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+</dependency>
+
+2）然后，在user-service中添加一个bootstrap.yaml文件，内容如下：
+
+spring:
+  application:
+    name: userservice # 服务名称
+  profiles:
+    active: dev #开发环境，这里是dev 
+  cloud:
+    nacos:
+      server-addr: localhost:8848 # Nacos地址
+      config:
+        file-extension: yaml # 文件后缀名
+
+
+tip：{spring.application.name}|{spring.profiles.active}|{spring.cloud.nacos.config.file-extension}作为文件id来读取配置
+
+3)在nacos管理平台的配置管理添加相对应的服务名称,服务名-环境配置.yaml
+
+
+二、Nacos配置热更新
+
+Nacos配置热更新的目的就是在nacos修改配置时项目能实时的获取更新配置,有两种方式
+方式一
+直接在@Value注入的变量所在类上添加注解@RefreshScope
+
+方式二
+使用@ConfigurationProperties注解代替@Value注解
+
+需要在对应的服务新建一个配置类
+
+@Component
+@Data
+@ConfigurationProperties(prefix = "pattern")
+public class PatternProperties {
+    private String dateformat;
+}
+
+在引用类中使用这个类代替@Value
+
+@Autowired
+  private PatternProperties patternProperties;
+
+  @GetMapping("now")
+  public String now(){
+      return LocalDateTime.now().format(DateTimeFormatter.ofPattern(patternProperties.getDateformat()));
+  }
+
+三、配置共享
+
+- `[spring.application.name]-[spring.profiles.active].yaml`，例如：userservice-dev.yaml
+
+- `[spring.application.name].yaml`，例如：userservice.yaml
+
+而`[spring.application.name].yaml`不包含环境，因此可以被多个环境共享。
+
+个人认为不推荐。或者说是所用类都可以共同的配置
+
+
+四、配置共享的优先级
+
+当nacos、服务本地同时出现相同属性时，优先级有高低之分：nacos > 本地配置
+
+服务名-profile.yaml > 服务名.yaml > 本地配置
+
+
+
+Nacos集群搭建
+
+此处踩过一个坑，使用的nacos版本不匹配，导致集群启动报错

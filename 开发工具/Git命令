@@ -37,3 +37,9 @@ git config --global user.email "xxx@xxx.com"
 ssh-keygen -t rsa -C "lwh768561@gmail.com"
 #查看密钥
 cat ~/.ssh/id_rsa.pub
+
+
+#2021年8月13日：git更换使用个人访问命令的方式进行远程代码操作
+
+在GitHub上生成Personal access tokens的token码
+在提交时，输入进去才能够提交代码
