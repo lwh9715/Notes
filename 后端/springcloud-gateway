@@ -48,8 +48,7 @@ spring:
           predicates: # 路由断言，也就是判断请求是否符合路由规则的条件
             - Path=/user/** # 这个是按照路径匹配，只要以/user/开头就符合要求
 
-ps：我们将 `/user/**`开头的请求，代理到`lb://userservice`，lb是负载均衡，根据服务名拉取服务列表，实现负载均衡。
-
+Ps：我们将 `/user/**`开头的请求，代理到`lb://userservice`，lb是负载均衡，根据服务名拉取服务列表，实现负载均衡。
 
 
 3）断言工厂
@@ -75,3 +74,177 @@ ps：我们将 `/user/**`开头的请求，代理到`lb://userservice`，lb是�
 | Query      | 请求参数必须包含指定参数       | - Query=name, Jack或者-  Query=name                          |
 | RemoteAddr | 请求者的ip必须是指定范围       | - RemoteAddr=192.168.1.1/24                                  |
 | Weight     | 权重处理                       |                                                              |
+
+
+
+4）路由过滤器的种类
+
+Spring提供了31种不同的路由过滤器工厂。例如：
+
+| **名称**             | **说明**                     |
+| -------------------- | ---------------------------- |
+| AddRequestHeader     | 给当前请求添加一个请求头     |
+| RemoveRequestHeader  | 移除请求中的一个请求头       |
+| AddResponseHeader    | 给响应结果中添加一个响应头   |
+| RemoveResponseHeader | 从响应结果中移除有一个响应头 |
+| RequestRateLimiter   | 限制请求的流量               |
+
+
+例子:请求头过滤器
+
+**需求**：给所有进入userservice的请求添加一个请求头：Truth=itcast is freaking awesome!
+
+只需要修改gateway服务的application.yml文件，添加路由过滤即可
+
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: user-service 
+        uri: lb://userservice 
+        predicates: 
+        - Path=/user/** 
+        filters: # 过滤器
+        - AddRequestHeader=Truth, Itcast is freaking awesome! # 添加请求头
+
+当前过滤器写在userservice路由下，因此仅仅对访问userservice的请求有效。
+
+
+如果要对所有的路由都生效，则可以将过滤器工厂写到default下。格式如下：
+
+spring:
+  cloud:
+    gateway:
+      routes:
+      - id: user-service 
+        uri: lb://userservice 
+        predicates: 
+        - Path=/user/**
+      default-filters: # 默认过滤项
+      - AddRequestHeader=Truth, Itcast is freaking awesome! 
+
+
+过滤器的作用是什么？
+
+① 对路由的请求或响应做加工处理，比如添加请求头
+
+② 配置在路由下的过滤器只对当前路由的请求生效
+
+defaultFilters的作用是什么？
+
+① 对所有路由都生效的过滤器
+
+
+5)全局过滤器
+
+上一节学习的过滤器，网关提供了31种，但每一种过滤器的作用都是固定的。如果我们希望拦截请求，做自己的业务逻辑则没办法实现。
+
+### 全局过滤器作用
+
+全局过滤器的作用也是处理一切进入网关的请求和微服务响应，与GatewayFilter的作用一样。
+区别在于GatewayFilter通过配置定义，处理逻辑是固定的；而GlobalFilter的逻辑需要自己写代码实现。
+
+定义方式是实现GlobalFilter接口。
+
+public interface GlobalFilter {
+    /**
+     *  处理当前请求，有必要的话通过{@link GatewayFilterChain}将请求交给下一个过滤器处理
+     *
+     * @param exchange 请求上下文，里面可以获取Request、Response等信息
+     * @param chain 用来把请求委托给下一个过滤器 
+     * @return {@code Mono<Void>} 返回标示当前过滤器业务结束
+     */
+    Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain);
+}
+
+
+在filter中编写自定义逻辑，可以实现下列功能：
+
+- 登录状态判断
+- 权限校验
+- 请求限流等
+
+代码如下：
+/**
+ * @author relax
+ * @version 1.0
+ * @功能描述：校验过滤器
+ * @date 2021/9/2 18:04
+ */
+
+//@Order(-1)
+@Component
+public class AuthorizeFilter implements GlobalFilter, Ordered {
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // 1.获取请求参数
+        MultiValueMap<String, String> params = exchange.getRequest().getQueryParams();
+        // 2.获取auth参数
+        String auth = params.getFirst("auth");
+        // 3.校验
+        if ("admin".equals(auth)) {
+            // 放行
+            return chain.filter(exchange);
+        }
+        // 4.拦截
+        // 4.1.禁止访问，设置状态码
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        // 4.2.结束处理
+        return exchange.getResponse().setComplete();
+    }
+
+    @Override
+    public int getOrder() {
+        return -1;
+    }
+}
+
+
+6）过滤器执行顺序
+请求进入网关会碰到三类过滤器：当前路由的过滤器、DefaultFilter、GlobalFilter
+
+请求路由后，会将当前路由过滤器和DefaultFilter、GlobalFilter，合并到一个过滤器链（集合）中，排序后依次执行每个过滤器
+
+排序的规则？
+
+- 每一个过滤器都必须指定一个int类型的order值，**order值越小，优先级越高，执行顺序越靠前**。
+- GlobalFilter通过实现Ordered接口，或者添加@Order注解来指定order值，由我们自己指定
+- 路由过滤器和defaultFilter的order由Spring指定，默认是按照声明顺序从1递增。
+- 当过滤器的order值一样时，会按照 defaultFilter > 路由过滤器 > GlobalFilter的顺序执行。
+
+
+7)跨域问题
+
+跨域：域名不一致就是跨域，主要包括：
+
+- 域名不同： www.taobao.com 和 www.taobao.org 和 www.jd.com 和 miaosha.jd.com
+
+- 域名相同，端口不同：localhost:8080和localhost8081
+
+跨域问题：浏览器禁止请求的发起者与服务端发生跨域ajax请求，请求被浏览器拦截的问题
+
+
+解决跨域问题
+
+在gateway服务的application.yml文件中，添加下面的配置：
+
+spring:
+  cloud:
+    gateway:
+      # 。。。
+      globalcors: # 全局的跨域处理
+        add-to-simple-url-handler-mapping: true # 解决options请求被拦截问题
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: # 允许哪些网站的跨域请求 
+              - "http://localhost:8090"
+            allowedMethods: # 允许的跨域ajax的请求方式
+              - "GET"
+              - "POST"
+              - "DELETE"
+              - "PUT"
+              - "OPTIONS"
+            allowedHeaders: "*" # 允许在请求中携带的头信息
+            allowCredentials: true # 是否允许携带cookie
+            maxAge: 360000 # 这次跨域检测的有效期
