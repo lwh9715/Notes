@@ -1,36 +1,135 @@
-linux命令
+centos 7 乱码解决
 
+-Dfile.encoding=utf-8
 
-du -h -x --max-depth=1  查看哪个目录占用过高
+1）查看系统是否安装了中文安装包
+locale -a |grep "zh_CN"
 
+2）查看系统当前的编码
+echo $LANG
+
+3）修改系统编码为中文（不需要加.utf-8）
+vim /etc/locale.conf
+LANG="zh_CN"
+
+立即生效
+source /etc/locale.conf
+
+4）查看系统的编码文件
+locale
+
+说明:
+("en_US.UTF-8"按照上面的内容可以理解为“你说英语，你在美国，语言字符集为UTF-8”)　
+
+每项的意思分别为 :
+
+LANG:当前系统的语言
+
+LC_CTYPE：语言符号及其分类
+
+LC_NUMERIC：数字
+
+LC_COLLATE：比较和排序习惯
+
+LC_TIME：时间显示格式
+
+LC_MONETARY：货币单位
+
+LC_MESSAGES：信息主要是提示信息,错误信息, 状态信息, 标题, 标签, 按钮和菜单等
+
+LC_NAME：姓名书写方式
+
+LC_ADDRESS：地址书写方式
+
+LC_TELEPHONE：电话号码书写方式
+
+LC_MEASUREMENT：度量衡表达方式
+
+LC_PAPER：默认纸张尺寸大小
+
+LC_IDENTIFICATION：对locale自身包含信息的概述
+
+LC_ALL：优先级最高变量，若设置了此变量，所有LC_* 和LANG变量会强制跟随它的值
+
+5）linux运行springboot项目
+
+在springboot的maven功能下（install）打包jar包
+
+把java***.jar项目拉到随意项目下
+编辑一个文件（vim start.sh）java -jar ***.java >/dev/null 2>&1 &
+nohup ./start.sh 运行，停止的话直接kill就行
+
+执行nohup java -jar do_iptable.jar & 运行jar会提示：nohup: 忽略输入并把输出追加到"nohup.out"
+
+执行nohup java -jar do_iptable.jar >/dev/null  & 运行jar会提示：nohup: 忽略输入重定向错误到标准输出端
+
+修改运行方式为nohup java -jar do_iptable.jar >/dev/null 2>&1 & 即可
+
+6）系统时钟和硬件时钟同步：
+# hwclock --systohc或者# clock --systohc  即用系统时钟同步硬件时钟
+
+7）安装防火墙
+yum install firewalld systemd -y
+
+8）查看已经开放的端口
+firewall-cmd --list-ports
+
+9）开放端口
+firewall-cmd --zone=public --add-port=8088/tcp --permanent
+
+10）关闭端口
+firewall-cmd --zone=public --remove-port=8088/tcp --permanent 
+
+11）重启防火墙
+systemctl reload firewalld
+
+12）查看防火墙状态
+systemctl status firewalld
+
+13）开启防火墙
+systemctl start firewalld
+
+14）关闭防火墙
+systemctl stop firewalld
+
+15）查看防火墙是否开放端口
+firewall-cmd --query-port=27017/tcp
+
+16）添加需要开通的端口
+firewall-cmd --permanent --add-port=27017/tcp
+
+17）获取本机ip
+curl ip.sb
+
+18）根据ps -ef | grep 进程名称查询具体Pid查看内存使用情况
+top -p Pid
+
+19）查看哪个目录占用过高
+du -h -x --max-depth=1
 
 Linux统计文件夹、文件数量的命令
-# 查看当前目录下的文件数量（不包含子目录中的文件）
 
+20）查看当前目录下的文件数量（不包含子目录中的文件）
 ls -l|grep "^-"| wc -l
-# 查看当前目录下的文件数量（包含子目录中的文件） 注意：R，代表子目录
 
+21）查看当前目录下的文件数量（包含子目录中的文件） 注意：R，代表子目录
 ls -lR|grep "^-"| wc -l
-# 查看当前目录下的文件夹目录个数（不包含子目录中的目录），同上述理，如果需要查看子目录的，加上R
 
+22）查看当前目录下的文件夹目录个数（不包含子目录中的目录），同上述理，如果需要查看子目录的，加上R
 ls -l|grep "^d"| wc -l
-# 查询当前路径下的指定前缀名的目录下的所有文件数量
-# 例如：统计所有以“20161124”开头的目录下的全部文件数量
 
+23）查询当前路径下的指定前缀名的目录下的所有文件数量
+# 例如：统计所有以“20161124”开头的目录下的全部文件数量
 ls -lR 20161124*/|grep "^-"| wc -l
 
 
-#查看linux所有被占用的端口
+24）查看linux所有被占用的端口
 netstat -tulnp
 
-#端口号查看当前端口号是否被占用
+25）端口号查看当前端口号是否被占用
 netstat -tulnp | grep *
-
-
-liangwenhui996@dingtalk.com
-
 
 curl命令
 
-curl http://www.chacewang.net/
+26）curl http://www.chacewang.net/
 标明：上面命令向www.chacewang.net发出 GET 请求，服务器返回的内容会在命令行输出。

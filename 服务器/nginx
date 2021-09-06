@@ -48,3 +48,31 @@ weight代表权重默认为1，权重越高被分配的请求次数越多
 每个请求按照访问ip的的hash结果分配，这样每个访客固定访问一个端口服务器，可解决session的问题
 4、fair（第三方）
 按后端服务器的响应时间来分配，响应时间段的优先分配
+
+
+5）docker 启动配置启动nginx https模式命令
+
+docker run -d --name nginx -p 80:80 -p 443:443 -v /home/nginx:/etc/nginx nginx
+
+小坑:上次因为没有配443端口，跳转之后一直访问不了https
+
+6）nginx https主要配置，在/etc/nginx/cert/存放网站ssl文件证书密钥即可
+
+server {
+	listen       443 ssl;
+	server_name  www.sjcl.club;
+
+	ssl_certificate      /etc/nginx/cert/sjcl.club.pem;
+	ssl_certificate_key  /etc/nginx/cert/sjcl.club.key;
+
+	ssl_session_cache    shared:SSL:1m;
+	ssl_session_timeout  5m;
+
+	ssl_ciphers  HIGH:!aNULL:!MD5;
+	ssl_prefer_server_ciphers  on;
+
+	location / {
+		root   /usr/share/nginx/html;
+		index  index.html index.htm;
+	}
+}
