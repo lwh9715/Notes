@@ -133,3 +133,6 @@ curl命令
 
 26）curl http://www.chacewang.net/
 标明：上面命令向www.chacewang.net发出 GET 请求，服务器返回的内容会在命令行输出。
+
+27）修改权限
+chmod +x /usr/local/bin/docker-compose

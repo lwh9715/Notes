@@ -148,7 +148,7 @@ tips：直接docker pull rabbitmq（不能打开web管理页面）
 #docker logs rabbit
 
 
-28）docker启动jar包方式
+28）docker启动jar包方式 （该方式为无镜像生成容器挂载模式）
 docker run -d -p 3000:3000 --name music
 -v /home/music/springboot-python-0.0.1-SNAPSHOT.jar:/home/music/springboot-python-0.0.1-SNAPSHOT.jar
 java:8u111 java -jar /home/music/springboot-python-0.0.1-SNAPSHOT.jar
@@ -176,8 +176,47 @@ docker save -o nginx.tar nginx:latest
 docker load -i nginx.tar
 
 
-31) docker 启动配置启动nginx https模式命令
+31)docker 启动配置启动nginx https模式命令
 
 docker run -d --name nginx -p 80:80 -p 443:443 -v /home/nginx:/etc/nginx nginx
 
 小坑:上次因为没有配443端口，跳转之后一直访问不了https
+
+
+32)Dockerfile语法
+
+Dockerfile就是一个文本文件，其中包含一个个的指令，用指令来说明要执行什么操作来构建镜像。每一个指令都会形成一层Layer。
+
+指令 						说明 									示例
+FROM					指定基础镜像								FROM Centos:7
+ENV 			设置环境变量，可在后面指令使用   					ENV  key value
+COPY 			拷贝本地文件到镜像指定的目录						copy ./mysql.5.5.rpm /tmp
+RUN 			执行Linux的shell命令，一般是安装过程的命令			RUN yun install gcc
+EXPOSE			指定容器运行时监听的端口，是给镜像者使用看的		EXPOSE 8848
+ENTRYPOINT		镜像中应用的启动命令，容器运行时调用				ENTRYPOINT java -jar xx.jar
+
+
+示例：
+
+# 指定基础镜像
+FROM ubuntu:16.04
+# 配置环境变量，JDK的安装目录
+ENV JAVA_DIR=/usr/local
+
+# 拷贝jdk和java项目的包
+COPY ./jdk8.tar.gz $JAVA_DIR/
+COPY ./docker-demo.jar /tmp/app.jar
+
+# 安装JDK
+RUN cd $JAVA_DIR \
+ && tar -xf ./jdk8.tar.gz \
+ && mv ./jdk1.8.0_144 ./java8
+
+# 配置环境变量
+ENV JAVA_HOME=$JAVA_DIR/java8
+ENV PATH=$PATH:$JAVA_HOME/bin
+
+# 暴露端口
+EXPOSE 8090
+# 入口，java项目的启动命令
+ENTRYPOINT java -jar /tmp/app.jar
