@@ -165,3 +165,19 @@ tips:
 java:8u111 表示镜像文件的名称和tag
 
 java -jar /usr/springboot-1.jar 表示运行jar包，注意：这里的jar包为容器中的位置，是通过前面的-v属性映射的
+
+
+29)使用docker save导出镜像到磁盘 
+
+docker save -o nginx.tar nginx:latest
+
+30)加载导出的**.tar文件到本地：
+
+docker load -i nginx.tar
+
+
+31) docker 启动配置启动nginx https模式命令
+
+docker run -d --name nginx -p 80:80 -p 443:443 -v /home/nginx:/etc/nginx nginx
+
+小坑:上次因为没有配443端口，跳转之后一直访问不了https
