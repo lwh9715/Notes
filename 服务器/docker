@@ -220,3 +220,8 @@ ENV PATH=$PATH:$JAVA_HOME/bin
 EXPOSE 8090
 # 入口，java项目的启动命令
 ENTRYPOINT java -jar /tmp/app.jar
+
+
+33)生成镜像的命令
+
+docker build -t javaweb:1.0 .

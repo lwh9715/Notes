@@ -27,7 +27,7 @@ UserDO user = restTemplate.getForObject(url, UserDO.class);
 
 2)添加注解
 
-在程序入口类添加EnableFeignClients
+在程序入口类添加 @EnableFeignClients
 
 3)编写Feign的客户端
 
@@ -61,12 +61,12 @@ Feign可以支持很多的自定义配置，如下表所示：
 配置方式：
 1）配置文件方式
 
-基于配置文件修改feign的日志级别可以针对单个服务:（针对所有服务：userserver 改成 default: # 这里用default就是全局配置）
+基于配置文件修改feign的日志级别可以针对单个服务:（如果要使全部调用到的服务都相同效果：下面的 userserver 改成 default: # 这里用default就是全局配置）
 
 feign:  
   client:
     config: 
-      userservice: # 针对某个微服务的配置
+      userservice: # 针对某个微服务的配置，改成default是全局模式
         loggerLevel: FULL #  日志级别 
 
 而日志的级别分为四种：
@@ -90,10 +90,12 @@ public class DefaultFeignConfiguration  {
 
 
 如果要**全局生效**，将其放到启动类的@EnableFeignClients这个注解中：
-@EnableFeignClients(defaultConfiguration = DefaultFeignConfiguration .class) 
+@EnableFeignClients(defaultConfiguration = DefaultFeignConfiguration.class) 
 
 如果是**局部生效**，则把它放到对应的@FeignClient这个注解中：
-@FeignClient(value = "userserver", configuration = DefaultFeignConfiguration .class) 
+@FeignClient(value = "userserver", configuration = DefaultFeignConfiguration.class) 
+
+
 
 四、Feign性能优化
 

@@ -47,6 +47,9 @@ spring:
           uri: lb://userservice # 路由的目标地址 lb就是负载均衡，后面跟服务名称
           predicates: # 路由断言，也就是判断请求是否符合路由规则的条件
             - Path=/user/** # 这个是按照路径匹配，只要以/user/开头就符合要求
+            
+            - After=2037-01-20T17:42:47.789-07:00[America/Denver] #断言工厂使用指南
+            - Before=2031-04-13T15:14:47.433+08:00[Asia/Shanghai] #断言工厂使用指南
 
 Ps：我们将 `/user/**`开头的请求，代理到`lb://userservice`，lb是负载均衡，根据服务名拉取服务列表，实现负载均衡。
 
