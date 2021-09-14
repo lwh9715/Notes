@@ -1,6 +1,5 @@
 window
 
-
 1)查看进程占用
 netstat -ano |findstr 8088
 

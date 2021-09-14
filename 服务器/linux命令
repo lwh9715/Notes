@@ -24,31 +24,18 @@ locale
 每项的意思分别为 :
 
 LANG:当前系统的语言
-
 LC_CTYPE：语言符号及其分类
-
 LC_NUMERIC：数字
-
 LC_COLLATE：比较和排序习惯
-
 LC_TIME：时间显示格式
-
 LC_MONETARY：货币单位
-
 LC_MESSAGES：信息主要是提示信息,错误信息, 状态信息, 标题, 标签, 按钮和菜单等
-
 LC_NAME：姓名书写方式
-
 LC_ADDRESS：地址书写方式
-
 LC_TELEPHONE：电话号码书写方式
-
 LC_MEASUREMENT：度量衡表达方式
-
 LC_PAPER：默认纸张尺寸大小
-
 LC_IDENTIFICATION：对locale自身包含信息的概述
-
 LC_ALL：优先级最高变量，若设置了此变量，所有LC_* 和LANG变量会强制跟随它的值
 
 5）linux运行springboot项目

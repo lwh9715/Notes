@@ -77,3 +77,12 @@ INSERT INTO tbl_policy_infos (SELECT * FROM tbl_policy_info WHERE id > 56975)
 
 #where IFNULL(t2.time_type,0) != 2
 MySQL函数里有一个很有用的函数IFNULL，它的形式是IFNULL(fieldA,fieldB),意义是当字段fieldA是NULL时取fieldB，不是NULL时取fieldA的值
+
+
+1)查看事务类型
+
+# select @@tx_isolation
+
+2)设置事务类型
+
+#set session transaction isolation level read committed;

@@ -1,5 +1,17 @@
 redis的常用命令主要分为两个方面、一个是键值相关命令、一个是服务器相关命令
 
+redis五大数据类型：
+
+String（字符串）
+
+list（列表）
+
+set（集合）
+
+hash（哈希）
+
+Zset（有序集合）
+
 1、键值相关命令
 
       keys * 取出当前所有的key
@@ -20,7 +32,7 @@ redis的常用命令主要分为两个方面、一个是键值相关命令、一
 
       randomkey 随机返回数据库里面的一个key
 
-      rename key2 key3 重命名key2 为key3
+      rename key2 key3 重命名key2 为key3      
 
       type key2 返回key的数据类型
       
@@ -54,8 +66,9 @@ redis-benchmark -h localhost -p 6379 -c 100 -n 100000
 4)redis 五大数据类型
 
 （1）string
+
 #追加字符串,如果name不存在，就相当于set一个name
-appen name 'hello'
+append name 'hello'
 
 #获取字符串的长度
 strlen name
@@ -223,7 +236,7 @@ zadd name1 zhangsan name2 lisi
 zrange name 0 -1
 
 5）三种特殊数据类型
-
+geospatial
 hyperloglog
 bigmaps
 
@@ -268,3 +281,25 @@ georadius china：city 100 30 500 km withcoord count 1
 georadiusbymember（找出位于指定元素周围的其它元素）
 georadiusbymember china:city shenzhen 500 km
 
+
+redis事务
+
+redis事务本质：一组命令的集合，一个事务中的所有命令都会被序列化，在事务执行过程中，会按照顺序执行！
+
+一次性，顺序性，排他性执行一些列的顺序！
+
+redis没有事务隔离级别的概念！
+
+所有的命令在事务当中，并没有直接被执行，只有发起执行命令的时候才会执行！Exec
+
+redis单条命令保存原子性，但是事务不保证原子性。
+
+redist的事务：
+
+事务开启（multi）> 命令队列（...）> 执行事务（exec）|| 取消事务（discard）
+
+注意：（常见的异常类型）
+
+1）编译型异常（代码有问题，命令有错），事务中所有的命令都不会被执行。
+
+2）运行时异常（1/0），如果事务中存在语法性错误，其他命令一样能够去执行，错误命令抛出异常。
