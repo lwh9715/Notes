@@ -51,7 +51,7 @@ setParameter:
 
 
 启动MongoDB服务命令:
-/usr/local/mongodb/bin/mongod -f /mongodb/single/mongod.conf
+/home/mongodb/mongodb-linux-x86_64-4.0.7/bin/mongod -f /home/mongodb/mongodb-linux-x86_64-4.0.7/config/mongod.conf
 
 注意：如果远程连接不上,需要配置防火墙放行
 
