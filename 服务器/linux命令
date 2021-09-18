@@ -70,6 +70,12 @@ firewall-cmd --zone=public --remove-port=8088/tcp --permanent
 11）重启防火墙
 systemctl reload firewalld
 
+#设置开机启动
+systemctl enable firewalld.service
+
+#禁用防火墙自启动
+systemctl disable firewalld.service
+
 12）查看防火墙状态
 systemctl status firewalld
 
