@@ -1,0 +1,207 @@
+rabbitMQ
+
+异步通信优点：
+
+1）耦合度低
+2）吞吐量提升
+3）故障隔离
+4)流量削峰
+
+异步通信的缺点：
+
+1）依赖broker（MQ）的可靠性，安全性，吞吐能力
+2）架构复杂了，业务没有明显的流程线，不好追踪管理
+
+
+linux服务器docker运行rabbitMQ命令
+
+docker run \
+-e RABBITMQ_DEFAULT_USER=relax \
+-e RABBITMQ_DEFALUT_PASS=123456 \
+--name rabbitmq \
+--hostname rabbitmq \
+-p 15672:15672 \
+-p 5672:5672 \
+-d \
+rabbitmq
+
+
+
+rabbitmq概念：
+
+1）channel：操作mq的工具
+2）exchange：路由消息到队列中
+3）queue：缓存消息
+4）virtual host： 虚拟主机，是对queue，exchange等资源的逻辑分组
+
+
+常见消息队列：
+
+基本消息队列（basic Queue）
+
+工作消息队列（Work Queue）
+
+发布订阅（Publish，Subscribe），又根据交换机类型不同分为三种：
+
+Fanout Exchange（广播）
+Direct Exchange（路由）
+Topic Exchange （主题）
+
+
+基本消息队列的消息发送流程：
+
+1）建立connection
+2）创建channel
+3）利用channel声明队列
+4）利用chennel向队列发送消息
+
+
+基本消息队列的消息接收流程：
+
+1）建立connection
+2）创建channel
+3）利用channel声明队列
+4）定义consumer的消费行为handleDelivery()
+5）利用channel将消费者与队列绑定
+
+注：以上两个是rabbitmq官方文档的连接mq方法，springAMQP将这些都封装好了，拿来即用（rabbitTemplate）
+
+
+springAMQP
+
+什么是AMQP?
+
+应用间消息通信的一种协议，与语言和平台无关。
+
+1）在pom文件中引入依赖（spring-boot-stater-amqp）
+2）在发送和接收项目的yml文件下添加mq的连接消息
+3）利用RabbitTemplate的convertAndSend发送消息
+4）在接受服务中需要接受消息的方法上添加@RabbitListener注解并指定对应的队列名称，方法参数就是消息
+
+注：消息一旦消费就会从队列中删除，rabbitMQ没有消息回溯功能
+
+
+工作消息队列（Work Queue）
+
+
+work queue工作队列，可以提高消息处理是速度，避免消息队列堆积
+
+消费预取限制：
+
+修改preFetch这个值，可以控制预取消费消息的上限
+
+spring:
+	rabbitmq:
+		listener:
+			simple:
+				prefetch: 1 #每次只能获取一条雄安锡，处理完成才能获取下一个消息
+
+
+
+发布订阅（Publish，Subscribe）
+
+
+SpringAMQP-FanoutExchange（广播）
+
+交换机的作用是什么？
+
+接受publisher发送的消息
+
+将消息按照规则路由到与之绑定的队列
+
+不能缓存消息，路由失败，消息丢失
+
+FanoutExchange的会将消息路由到每个绑定的队列
+
+
+声明队列，交换机，绑定关系的bean是什么？
+
+Queue
+
+FanoutExchange
+
+Binding
+
+
+在服务中新建一个交换机的配置类（FanoutExchange），添加@Configuration注解，
+并声明FanoutExchange，Queue和绑定关系对象Binding，代码如下
+
+@Configuration
+public class FanoutConfig{
+	
+	//声明FanoutExchange交换机
+	@Bean
+	public FanoutExchange fanoutExchange(){
+		return new FanoutExchange("relax.fanout");
+	}
+
+	//声明第一个队列
+	@Bean
+	public Queue queue(){
+		return new Queue(fanout.queue);
+	}
+
+	//绑定队列和交换机
+	public Binding  bindingQueue(Queue queue,FanoutExchange fanoutExchange){
+		return BindingBulider.bind(queue).to(fanoutExchange);
+	}
+
+}
+
+
+SpringAMQP-DirectExchange（路由）
+
+描述下Direct交换机与Fanout交换机的差异？
+
+1）Fanout交换机将消息路由给每一个与之绑定的队列
+2）direct交换机根据routingKey判断路由给那个队列
+3）如果多个队列具有相同的RoutingKey，则与Fanout功能类似
+
+
+Direct Exchange会将接收到的消息根据规则路由到指定的queue，因此称为路由模式（routes）。
+
+1）每一个Queue都与Exchange设置一个BindingKey
+2）发布者发送消息时，指定消息的RouteingKey
+3）Exchange将消息路由的BindingKey与消息RoutingKey一致的队列
+
+
+在消费者服务中，利用RabbitListener声明Exchange，Queue，RoutingKey，代码如下
+
+
+@RabbitListener(bindings = @QueueBinding(value = @Queue("direct.queue"),
+exchange = @Exchange(relax.direct),type = ExchangeTypes.DIRECR),key = {"red","blue"})
+public void listenerQueue(String msg){
+	System.err.println("消费者接收到的Direct消息" + msg);
+}
+
+
+
+SpringAMQP-Topic Exchange（主题）
+
+TopicExchange与DirctExchange类似，区别routingKey必须时多个单词的列表，并且与.分割
+Queue与Exchange指定BindingKey可以使用通配符：
+#：代指0个或多个单词
+*：代指一个单词
+
+
+@RabbitListener(bindings = @QueueBinding(value = @Queue("direct.queue"),
+exchange = @Exchange(relax.Topic),type = ExchangeTypes.TOPIC),key = "china.#")
+public void listenerQueue(String msg){
+	System.err.println("消费者接收到的Topic消息" + msg);
+}
+
+
+Spring-AMQP 消息转换器
+
+Spring-AMQP中消息的序列化和反序列化时怎么实现的？
+
+1）利用MessageConverter实现的，默认时jdk序列化
+2）注意发送方和接收方必须使用相同的MessageConverter
+
+1）在消息发送服务端引入依赖(jackson-dataformat-xml)
+2）在消息发送服务端主方法声明MessageConverter
+
+@Bean
+public MessageConverter jsonMessageConverter(){
+	return new Jackson2MessageConverter();
+}
