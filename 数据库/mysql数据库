@@ -86,3 +86,11 @@ MySQL函数里有一个很有用的函数IFNULL，它的形式是IFNULL(fieldA,f
 2)设置事务类型
 
 #set session transaction isolation level read committed;
+
+关键字：sum
+
+#在SUM,GROUP BY查询时,使用ANY_VALUE可以返回非分组的参数
+SELECT SUM(OrderAmount),ANY_VALUE(DoctorID),ANY_VALUE(DoctorName),ANY_VALUE(DoctorAvatar)
+FROM bus_orders
+WHERE ClinicID = 100052
+GROUP BY DoctorID
