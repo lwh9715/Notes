@@ -1,1 +1,7 @@
 Hutool工具类
+
+方法	                说明
+Convert.ToInt32()	    转换为整型(int 型)
+Convert.ToStringle()	转换为单精度浮点型(float 型)
+Convert.ToDouble()	  转换为双精度浮点型(double 型)
+Convert.ToString()	  转换为字符串类型(string 型)
