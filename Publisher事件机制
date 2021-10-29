@@ -1,0 +1,79 @@
+SpringBoot的ApplicationEventPublisher，监听ApplicationEvent异步操作
+
+1）EventPublisher
+
+定义EventPublisher，并添加Component注释
+
+例子：
+
+@Component
+public class EventPublisher {
+    private static ApplicationEventPublisher publisher;
+
+    EventPublisher(ApplicationEventPublisher publisher) {
+        EventPublisher.publisher = publisher;
+    }
+
+    public static void publish(ApplicationEvent event){
+        EventPublisher.publisher.publishEvent(event);
+    }
+}
+
+
+2）自定义Event事件
+
+自定义Event类需要继承ApplicationEvent重写自定义Event类的方法
+
+例子：
+
+public class DoctorOrderEvent extends ApplicationEvent {
+
+    private Long clinicID;
+    private List<Order> orderList;
+
+    /**
+     * Create a new {@code ApplicationEvent}.
+     *
+     * @param source the object on which the event initially occurred or with
+     *               which the event is associated (never {@code null})
+     */
+    public DoctorOrderEvent(Object source, Long clinicID, List<Order> orderList) {
+        super(source);
+
+        this.clinicID = clinicID;
+        this.orderList = orderList;
+    }
+}
+
+
+3）自定义Listener监听
+
+自定义Listener监听类需要添加@Async和@EventListener注释
+
+例子：
+
+@Component
+public class DoctorListener {
+
+    @Autowired
+    private SupportRepository supportRepository;
+
+    @Async
+    @EventListener
+    public void handleDoctorOrderEvent(DoctorOrderEvent doctorOrderEvent){
+        System.out.println(doctorOrderEvent);
+    }
+}
+
+
+4）在业务逻辑新建DoctorOrderEvent事件，使用EventPublisher.publish推送事件
+
+例子：
+
+@Transactional
+public boolean changeSupportDoctorChange(ChangeDoctorUserCommand command) {
+    logger.debug("changeSupportDoctorChange command {}",command);
+    DoctorOrderEvent doctorOrderEvent = new DoctorOrderEvent(this,null, command.getDoctorID(), null);
+    EventPublisher.publish(doctorOrderEvent);
+    return supportRepository.changeSupportDoctorChange(command);
+}
