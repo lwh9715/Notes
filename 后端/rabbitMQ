@@ -16,8 +16,6 @@ rabbitMQ
 linux服务器docker运行rabbitMQ命令
 
 docker run \
--e RABBITMQ_DEFAULT_USER=relax \
--e RABBITMQ_DEFALUT_PASS=123456 \
 --name rabbitmq \
 --hostname rabbitmq \
 -p 15672:15672 \
@@ -94,7 +92,7 @@ spring:
 	rabbitmq:
 		listener:
 			simple:
-				prefetch: 1 #每次只能获取一条雄安锡，处理完成才能获取下一个消息
+				prefetch: 1 #每次只能获取一条消息，处理完成才能获取下一个消息
 
 
 
@@ -143,7 +141,7 @@ public class FanoutConfig{
 
 	//绑定队列和交换机
 	public Binding  bindingQueue(Queue queue,FanoutExchange fanoutExchange){
-		return BindingBulider.bind(queue).to(fanoutExchange);
+		return BindingBuilder.bind(queue).to(fanoutExchange);
 	}
 
 }
@@ -169,11 +167,10 @@ Direct Exchange会将接收到的消息根据规则路由到指定的queue，因
 
 
 @RabbitListener(bindings = @QueueBinding(value = @Queue("direct.queue"),
-exchange = @Exchange(relax.direct),type = ExchangeTypes.DIRECR),key = {"red","blue"})
+exchange = @Exchange(relax.direct),type = ExchangeTypes.DIRECT),key = {"red","blue"})
 public void listenerQueue(String msg){
 	System.err.println("消费者接收到的Direct消息" + msg);
 }
-
 
 
 SpringAMQP-Topic Exchange（主题）
