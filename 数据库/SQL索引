@@ -1,0 +1,33 @@
+SQL索引
+
+CREATE  [UNIQUE | FULLTEXT | SPATIAL]  INDEX  索引名 ON  表名(字段名) [USING 索引方法]；
+
+#UNIQUE:可选。表示索引为唯一性索引。
+#FULLTEXT:可选。表示索引为全文索引。
+#SPATIAL:可选。表示索引为空间索引。
+#INDEX和KEY:用于指定字段为索引，两者选择其中之一就可以了，作用是    一样的。
+#索引名:可选。给创建的索引取一个新名称。
+#字段名1:指定索引对应的字段的名称，该字段必须是前面定义好的字段。
+#长度:可选。指索引的长度，必须是字符串类型才可以使用。
+#ASC:可选。表示升序排列。
+#DESC:可选。表示降序排列。
+注：索引方法默认使用B+TREE。
+
+
+
+1）查看表索引
+
+SHOW INDEX FROM bus_books
+
+2)创建单列索引
+
+CREATE INDEX book_index ON bus_books (Book)
+
+
+2)创建组合索引
+
+CREATE INDEX book_index ON bus_books (Book,BookDate)
+
+3）删除指定索引
+
+DROP INDEX book_index ON bus_books
