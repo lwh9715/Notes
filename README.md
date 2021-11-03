@@ -15,4 +15,4 @@ MultipartFile转File
 https://www.cnblogs.com/baby123/p/12329355.html
 
 #护眼脚本地址
-https://greasyfork.org/zh-CN/scripts/14716-%E6%8A%A4%E7%9C%BC%E8%84%9A%E6%9C%AC
+https://www.baiduyun.wiki/install-darkmode.html
