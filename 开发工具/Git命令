@@ -25,16 +25,21 @@ tips：需要本地仓库与远程仓库一致才能生效
 git pull <远程主机名> <远程分支名>:<本地分支名>
 
 #git remote -v
+
 查看信息
 
+
+# 查看当前用户（global）配置
+git config --global  --list
+
 # 配置用户名
-git config --global user.name "xxx"
+git config --global user.name "lwh9715"
 
 # 配置邮件
-git config --global user.email "xxx@xxx.com"
+git config --global user.email "lwh9715@gmail.com"
 
 #设置ssh密钥
-ssh-keygen -t rsa -C "lwh768561@gmail.com"
+ssh-keygen -t rsa -C "lwh9715@gmail.com"
 #查看密钥
 cat ~/.ssh/id_rsa.pub
 
@@ -43,3 +48,7 @@ cat ~/.ssh/id_rsa.pub
 
 在GitHub上生成Personal access tokens的token码
 在提交时，输入进去才能够提交代码
+
+
+
+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
