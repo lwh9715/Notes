@@ -1,79 +1,128 @@
 nginx 使用：
-1）nginx概念（反向代理，负载均衡，动静分离）
-1、反向代理
-	正向代理：在客户端配置代理服务器，通过代理服务器进行互联网访问
-	反向代理：反向代理服务器就相当于目标服务器，即用户直接访问反向代理服务器就可以获得目标服务器的资源
-2、负载均衡
-	负载均衡：增加服务器数量，然后将请求通过nginx分发到各个服务器，以达到负载均衡分配
-	效果：在浏览器输入localhost地址，负载均衡会均衡分配到各个端口
+一、nginx概念（反向代理，负载均衡，动静分离）
+	1）反向代理
+		正向代理：在客户端配置代理服务器，通过代理服务器进行互联网访问
+		反向代理：反向代理服务器就相当于目标服务器，即用户直接访问反向代理服务器就可以获得目标服务器的资源
+	2）负载均衡
+		负载均衡：增加服务器数量，然后将请求通过nginx分发到各个服务器，以达到负载均衡分配
+		效果：在浏览器输入localhost地址，负载均衡会均衡分配到各个端口
+	3）动静分离
+		动静分离：为了加速网站的解析速度，可以把动态页面和静态页面分别
+				放到不同的服务器进行解析，加速并降低单边服务器的压力
 
-3、动静分离
-	动静分离：为了加速网站的解析速度，可以把动态页面和静态页面分别
-			放到不同的服务器进行解析，加速并降低单边服务器的压力
+二、nginx配置文件
 
-2）nginx安装，命令和配置
-
-
-3）nginx配置文件
-
-第一部分：全局块（影响nginx服务器整体运行的配置）
+	第一部分：全局块（影响nginx服务器整体运行的配置）
 	
-1、work_processes值越大，支持的并发量越多
-配置文件实例：worker_processes  1;
+	1）work_processes值越大，支持的并发量越多
+	配置文件实例：worker_processes  1;
 	
-第二部分：events块（影响nginx与用户的网络连接）
+	第二部分：events块（影响nginx与用户的网络连接）
 	
-1、work_connection 1204 支持的最大连接数
-配置文件实例：events {worker_connections  1024;}
+	1）work_connection 1204 支持的最大连接数
+	配置文件实例：events {worker_connections  1024;}
 	
-第三部分：http块（包括http全局块，server块）
+	第三部分：http块（包括http全局块，server块）
 	
-1、http块配置文件实例：
-http {
-	upstream mytomcat{
-	server 192.168.43.86:8081;
-	server 192.168.43.86:8084;
-	}}
-2、server块配置实例：
-server {
-	listen       80;
-	server_name  192.168.43.86;    
-	location / {proxy_pass      http://mytomcat;
-	}
+	1）http块配置文件实例：
+	http {
+		upstream mytomcat{
+		server 192.168.43.86:8081;
+		server 192.168.43.86:8084;
+		}}
+	2）server块配置实例：
+	server {
+		listen       80;
+		server_name  192.168.43.86;    
+		location / {proxy_pass      http://mytomcat;
+		}
 			
-			
-4）nginx分配的策略：
-1、轮询（默认）
-每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉还会自动剔除
+三、nginx分配的策略：
+	1）轮询（默认）
+	每个请求按时间顺序逐一分配到不同的后端服务器，如果后端服务器down掉还会自动剔除
 
-2、weight（权重）
-weight代表权重默认为1，权重越高被分配的请求次数越多
+	2）weight（权重）
+	weight代表权重默认为1，权重越高被分配的请求次数越多
 
-3、ip_hash
-每个请求按照访问ip的的hash结果分配，这样每个访客固定访问一个端口服务器，可解决session的问题
+	3）ip_hash
+	每个请求按照访问ip的的hash结果分配，这样每个访客固定访问一个端口服务器，可解决session的问题
 
-4、fair（第三方）
-按后端服务器的响应时间来分配，响应时间段的优先分配
+	4）fair（第三方）
+	按后端服务器的响应时间来分配，响应时间段的优先分配
 
-5）nginx https主要配置，在/etc/nginx/cert/存放网站ssl文件证书密钥即可
+四、nginx https主要配置，在/etc/nginx/cert/存放网站ssl文件证书密钥即可
 
-server {
-	listen       443 ssl;
-	server_name  www.sjcl.club;
+	server {
+		listen       443 ssl;
+		server_name  www.sjcl.club;
 
-	ssl_certificate      /etc/nginx/cert/sjcl.club.pem;
-	ssl_certificate_key  /etc/nginx/cert/sjcl.club.key;
+		ssl_certificate      /etc/nginx/cert/sjcl.club.pem;
+		ssl_certificate_key  /etc/nginx/cert/sjcl.club.key;
 
-	ssl_session_cache    shared:SSL:1m;
-	ssl_session_timeout  5m;
+		ssl_session_cache    shared:SSL:1m;
+		ssl_session_timeout  5m;
 
-	ssl_ciphers  HIGH:!aNULL:!MD5;
-	ssl_prefer_server_ciphers  on;
+		ssl_ciphers  HIGH:!aNULL:!MD5;
+		ssl_prefer_server_ciphers  on;
 
-	location / {
-		root   /usr/share/nginx/html;
-		index  index.html index.htm;
+		location / {
+			root   /usr/share/nginx/html;
+			index  index.html index.htm;
+		}
 	}
-}
 
-注意：443和80端口的区别
+	注意：443和80端口的区别
+
+五、default.conf配置
+
+	1)默认写法
+		server {
+	        listen       80;
+	        listen  [::]:80;
+	        server_name  localhost;
+	    location / {
+	                root   /usr/share/nginx/html;
+	                index  index.html index.htm;
+	    }
+	        error_page   500 502 503 504  /50x.html;
+	        location = /50x.html {
+	                root   /usr/share/nginx/html;
+	        }
+		}
+	2)静态文件服务器
+		server {
+		    listen       80;
+		    location / {
+		        root   /usr/share/nginx/html;
+		        index  index.html index.htm;
+		    }
+		    location /static {
+		        alias   /data;
+		        autoindex on;
+		    }
+		}
+	3)负载均衡
+		upstream testServe {
+        server 127.0.0.1:8000 weight=3;
+        server 127.0.0.1:8001;
+        server 127.0.0.1:8002;
+		}
+		server {
+		        listen 80;
+		        localhost / {
+		                proxy_pass http://testServe;
+		        }
+		}
+	4)修改请求信息，转发到目标路径
+		server {
+		    listen  8080;
+		    location / {
+		        proxy_pass http://10.251.63.35:8080;
+		    }
+		    location /rewrite {
+		        if ($uri = /rewrite) {
+		            rewrite /rewrite http://10.251.63.35:8080 break;
+		        }
+		        rewrite /rewrite/([^/]*)/(.*) http://10.251.63.35:8080/$1/$2 break;
+		    }
+		}
