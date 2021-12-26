@@ -129,3 +129,7 @@ curl命令
 
 27）修改权限
 chmod +x /usr/local/bin/docker-compose
+
+28）scp 远程传输
+scp -r /home/nginx.tar root@sjcl.club:/home
+标明：home/nginx.tar 为本地文件,root@sjcl.club:/home 则是远程服务器用户名@ip地址:目录
