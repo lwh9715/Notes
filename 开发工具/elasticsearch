@@ -1,0 +1,43 @@
+elasticsearch
+
+文档：一条数据就是一个文档，es是json格式
+字段：json文档中的字段
+索引：同类型文档的集合
+映射：索引中文档的约束，比如字段名称类型
+
+
+1）创建网络
+docker network create es-net
+
+
+2)拉取elasticsearch镜像
+docker pull elasticsearch:7.12.1
+
+3)启动elasticsearch
+docker run -d \
+--name es \
+-e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+-e "discovery.type=single-node" \
+-v es-data:/usr/share/elasticsearch/data \
+-v es-plugins:/usr/share/elasticsearch/plugins \
+--privileged \
+--network es-net \
+-p 9200:9200 \
+-p 9300:9300 \
+elasticsearch:7.12.1
+
+
+4)部署kibana
+docker run -d --name kibana \
+-e ELASTICSEARCH_HOSTS=http://es:9200 \
+--network=es-net \
+-p 5601:5601 \
+kibana:7.12.1
+
+5)安装IK分词器
+下载ik分词器文件压缩包,放到es-plugins数据卷中，重启es即可生效
+https://github.com/medcl/elasticsearch-analysis-ik/releases/tag/v7.12.1
+
+"analyzer": "ik_max_word",更细化分词，占用内存更多
+"analyzer": "ik_smart",中文分词，占用内存少
+
