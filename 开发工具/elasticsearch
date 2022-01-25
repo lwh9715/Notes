@@ -117,7 +117,7 @@ DELETE /amos
 
 11)修改索引库
 
-索引库和mapping一旦创建无法修改，但是可以添加新的字段，语法如下
+索引库和mapping一旦创建无法修改，但是可以添加新的字段（全新的字段名），语法如下
 
 PUT /amos/_mapping
 
@@ -125,6 +125,79 @@ PUT /amos/_mapping
 	"properties":{
 		"新字段名称":{
 			"type":"object"
-		}
+		}	
 	}
+}
+
+DSL语法示例：
+
+POST /索引库名/_doc/文档id
+{
+	"字段1":"值1",
+	"字段2":"值2",
+	"字段3":{
+			"子属性1":"值3",
+			"子属性2":"值4",
+	},
+}
+
+12）添加文档
+
+POST /amos/_doc/a1
+{
+  "info":"liangwenhui振作起来",
+  "email":"lwh9715@gmail.com",
+  "name":{
+    "firstname":"wenhui",
+    "lastname":"liang"
+  }
+}
+
+13）查询文档
+
+GET /amos/_doc/a1
+
+14）删除文档
+
+DELETE /amos/_doc/a1
+
+15）修改文档
+
+方式一：全量修改，会删除旧的文档，添加新的文档
+
+POST /amos/_doc/a1
+{
+  "info":"liangwenhui振作起来",
+  "email":"lwh9715@gmail.com",
+  "name":{
+    "firstname":"wenhui",
+    "lastname":"liang"
+  }
+}
+
+方式二：局部更新	（doc为固定写法）
+
+POST /amos/_update/a1
+{
+  "doc": {
+      "info":"liangwenhui振作",
+      "email":"lwx768561@gmail.com" 
+  }
+}
+
+
+16)es支持两种地理坐标数据类型
+
+geo_point:由纬度和经度确定的一个点
+geo_shape:有多个geo_point组成的复杂几何图形
+
+17）字段拷贝可以使用copy_to属性将当前字段拷贝到指定字段
+
+"all":{
+	"type":"text",
+	"analyzer":"ik_max_word"
+},
+"brand":{
+	"type":"keyword",
+	"copy_to":"all"
 }

@@ -113,3 +113,8 @@ if (map.get(key) != null) {
 }
 
 16)文件正在使用中，删除不了，原因是流没有被关闭。每次创建流时记使用完记得关闭流。
+
+
+17)转换Java的Date类型
+
+@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
