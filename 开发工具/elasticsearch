@@ -201,3 +201,222 @@ geo_shape:有多个geo_point组成的复杂几何图形
 	"type":"keyword",
 	"copy_to":"all"
 }
+
+
+第二阶段
+
+分布式搜索引擎
+
+DSL 查询语法
+
+1）查询所有
+查询出所有数据，一般用于测试。
+例如：match_all
+
+GET /amos/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+2）全文检索查询
+利用分词器对用户输入内容分词，然后去倒排索引库中匹配。
+例如：match_query,multi_match_query
+
+GET /amos/_search
+{
+  "query": {
+    "match": {
+      "word": "00后少年为冬奥梦每天零下30度晨练"
+    }
+  }
+}
+
+
+GET /amos/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "影视",
+      "fields": ["word","mid"]
+    }
+  }
+}
+
+
+3）精准查询
+根据精确词条值查询，一般是查找keyword，数值，日期，Boolean等类型字段。
+例如：ids,range(根据值的范围查询),term(根据词条精确值查询)
+
+GET /amos/_search
+{
+  "query": {
+    "term": {
+      "iconDesc": {
+        "value": "爆"
+      }
+    }
+  }
+}
+
+GET /amos/_search
+{
+  "query": {
+    "range": {
+      "onboardTime": {
+        "gte": 163936417000,
+        "lte": 1639364187000
+      }
+    }
+  }
+}
+
+4）地理查询
+根据经纬度查询
+例如：geo_distance，geo_bounding_box
+
+GET /amos/_search
+{
+  "query": {
+    "geo_distance": {
+      "distance": "15km",
+      "location": "31.21,121.5"
+    }
+  }
+}
+
+
+5）复合查询
+复合查询可以将上述各种查询条件组合起来，合并查询条件。
+例如：bool，function_score
+
+#function_score 复合查询
+GET /amos/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match": {
+          "iconDesc": "爆"
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "term": {
+              "category": "国内要闻"
+            }
+          },
+          "weight": 10
+        }
+      ],
+      "boost_mode": "sum"
+    }
+  }
+}
+
+Tips：
+1）query 表示原始查询条件，搜索文档并根据相关性打分
+2）filter 过滤条件，符合条件的文档才会被重新算分
+3）weight 算分函数，将来回与query查询出来的score运算，得到新的分数。
+算分函数包括：
+weight（给一个常量值，作为函数结果）
+field_value_factor（用文档中的某个字段作为函数结果）
+random_score（随机生成一个值，作为函数结果）
+script_score（自定义计算公式，公式结果作为函数结果）
+4)加权模式，定义function score与query score的运算方式。
+加权模式包括：
+multiply（两者相乘）为默认加权模式
+replace（用function score 替换 query score）
+其他 sum（两者相加）avg（两者的平均值）max min
+
+
+
+#bool 复合查询
+GET /amos/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "iconDesc": {
+              "value": "爆"
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "term": {
+            "category": {
+              "value": "游戏"
+            }
+          }
+        },
+        {
+          "term": {
+            "category": {
+              "value": "音乐"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "term": {
+            "category": {
+              "value": "社会新闻"
+            }
+          }
+        },
+        {
+          "term": {
+            "category": {
+              "value": "国内要闻"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "category": "艺人"
+          }
+        }
+      ]
+    }
+  }
+}
+
+Tips：
+1）must 必须匹配每个子查询，类似"与"
+2）should 选择性匹配子查询，类似"或"
+3）must_not 必须不匹配，不参与算分，类似"非"
+4）filter 必须匹配，不参与算分
+
+
+
+搜索结果处理
+
+1）排序
+
+GET /amos/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    {
+      "iconDesc": {
+        "order": "asc"
+      }
+    },
+        {
+      "category": {
+        "order": "desc"
+      }
+    }
+  ]
+}
