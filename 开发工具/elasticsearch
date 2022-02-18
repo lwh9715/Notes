@@ -292,6 +292,7 @@ GET /amos/_search
 例如：bool，function_score
 
 #function_score 复合查询
+
 GET /amos/_search
 {
   "query": {
@@ -334,6 +335,7 @@ replace（用function score 替换 query score）
 
 
 #bool 复合查询
+
 GET /amos/_search
 {
   "query": {
@@ -420,3 +422,111 @@ GET /amos/_search
     }
   ]
 }
+
+2）分页
+
+elasticsearch 默认情况下只返回top10条数据，如果需要更多则要修改分页参数
+
+GET /amos/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 8000, 
+  "size": 2, 
+  "sort": [
+    {
+      "iconDesc": {
+        "order": "asc"
+      }
+    },
+        {
+      "category": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+Tips：
+1）from 分页开始的位置，默认为0
+2）size 期望获取的文档总数 
+
+深度分页问题：
+如果搜索页数过深，或者结果集越大，对内存和cpu的消耗越高，因此es设定结果集查询的上限是10000
+
+
+3）高亮
+
+GET /amos/_search
+{
+  "query": {
+    "match": {
+      "category": "艺人"
+    }
+  },
+  "highlight": {
+    "fields": {
+      "category": {
+        "pre_tags": "<em>",
+        "post_tags": "</em>"
+      },
+      "word": {
+        "pre_tags": "<em>",
+        "post_tags": "</em>"
+      }
+    }
+  }
+}
+
+Tips:
+1) pre_tags高亮内容的前置标签
+2) post_tags高亮内容的后置标签
+
+
+第三阶段
+
+1）Bucket 聚合功能
+
+aggs代表集合，与query同级
+
+GET /amos/_search
+{
+  "size": 0,
+  "aggs": {
+    "categoryagg": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      }
+    }
+  }
+}
+
+Bucket聚合-限定聚合范围
+默认情况下，Bucket集合是对索引库所有的文档做聚合，做限定聚合，只要添加query条件即可
+
+GET /amos/_search
+{
+  "query": {
+    "range": {
+      "onboardTime": {
+        "gte": 1639364187000
+      }
+    }
+  }, 
+  "size": 0,
+  "aggs": {
+    "categoryagg": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      }
+    }
+  }
+}
+
+Tips：聚合和配置的属性
+1）size：指定聚合结果的数量
+2）order：指定聚合结果排序方式
+3）field：指定聚合字段
