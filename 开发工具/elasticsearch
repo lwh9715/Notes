@@ -530,3 +530,122 @@ Tips：聚合和配置的属性
 1）size：指定聚合结果的数量
 2）order：指定聚合结果排序方式
 3）field：指定聚合字段
+
+
+2）Metric 嵌套聚合
+
+#嵌套聚合metric
+
+GET /amos/_search
+{
+  "size": 0,
+  "aggs": {
+    "categoryAgg": {
+      "terms": {
+        "field": "category",
+        "size": 5
+      },
+      "aggs": {
+        "rawHotAgg": {
+          "stats": {
+            "field": "realPos"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+3）自动补全
+
+首先去官网下载拼音插件
+https://github.com/medcl/elasticsearch-analysis-pinyin/releases/tag/v7.12.1
+
+把插件解压放入es 挂载插件目录
+/var/lib/docker/volumes/es-plugins/_data
+
+重启elasticsearch
+docker restart es
+
+
+自定义分词器：
+1）插件索引库时，在setting中配置，可以包含三部分
+2）character filter
+3）tokenizer
+4）filter
+
+
+创建拼音分词器DSL语句
+
+PUT /amos
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "py_analyzer": {
+          "tokenizer": "ik_max_word",
+          "filter": "py"
+        }
+      },
+      "filter": {
+        "py": {
+          "type": "pinyin",
+          "keep_full_pinyin": false,
+          "keep_joined_full_pinyin": true,
+          "keep_original": true,
+          "limit_first_letter_length": 16,
+          "remove_duplicated_term": true,
+          "none_chinese_pinyin_tokenizer": false
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "word": {
+        "type": "text",
+        "analyzer": "py_analyzer",
+        "search_analyzer": "ik_max_word"
+      },
+      "category": {
+        "type": "keyword"
+      },
+      "realPos": {
+        "type": "long",
+        "index": false
+      }
+    }
+  }
+}
+
+
+#自动补全查询
+
+GET /amos_1/_search
+{
+  "suggest": {
+    "amos_Suggest": {
+      "text": "北京东奥会",
+      "completion": {
+        "field": "word",
+        "skip_duplicates": true,
+        "size": 10
+      }
+    }
+  }
+}
+
+Tips：前提条件时字段必须是 completion 类型；例如
+
+PUT /amos_1
+{
+  "mappings": {
+    "properties": {
+      "word": {
+        "type": "completion"
+      }
+    }
+  }
+}
+

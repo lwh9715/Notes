@@ -236,3 +236,24 @@ docker run --name nacos -d -p 8848:8848 \
 -e JVM_XMS=512m -e JVM_XMX=512m -e MODE=standalone \
 -v   \
 bdf60dc2ada3
+
+
+35)查看挂载目录
+
+docker inspect redis | grep Mounts -A 20
+
+
+36）docker 方式启动redis进入命令面板
+
+docker exec -it sentinel-27001 redis-cli -h 42.192.139.14 -p 6379
+
+
+37）docker 方式启动sentinel集群监控命令
+
+docker run -d --name sentinel-27001 \
+-v /home/redis/sentinel/27001/sentinel.conf:/conf/sentinel.conf \
+-v /home/redis/sentinel/27001:/var/log/sentinel \
+--network host \
+redis \
+redis-sentinel \
+/conf/sentinel.conf --sentinel
