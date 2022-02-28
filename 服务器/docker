@@ -257,3 +257,11 @@ docker run -d --name sentinel-27001 \
 redis \
 redis-sentinel \
 /conf/sentinel.conf --sentinel
+
+
+38）docker 方式启动redis
+
+docker run -p 6379:6379 --name redis \
+-v /usr/local/redis.conf:/etc/redis/redis.conf \
+-v /usr/local/data:/data \
+-d redis redis-server /etc/redis/redis.conf
