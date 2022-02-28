@@ -1,0 +1,402 @@
+redis的常用命令主要分为两个方面、一个是键值相关命令、一个是服务器相关命令
+
+redis五大数据类型：
+
+String（字符串）
+
+list（列表）
+
+set（集合）
+
+hash（哈希）
+
+Zset（有序集合）
+
+1、键值相关命令
+
+      keys * 取出当前所有的key
+
+      exists name 查看n是否有name这个key
+
+      del name 删除key name
+
+      expire name 100 设置name这个key100秒过期
+
+      ttl name 获取confirm 这个key的有效时长
+
+      select 0 选择到0数据库 redis默认的数据库是0~15一共16个数据库(切换数据库（默认16个数据库）)
+
+      move name 1 将当前数据库中的key移动到其他的数据库中，这里就是把name这个key从当前数据库中移动到1中
+
+      persist name 移除name这个key的过期时间
+
+      randomkey 随机返回数据库里面的一个key
+
+      rename key2 key3 重命名key2 为key3      
+
+      type key2 返回key的数据类型
+      
+
+2、服务器相关命令
+
+      ping PONG返回响应是否连接成功
+
+      echo 在命令行打印一些内容
+
+      select 0~15 编号的数据库
+
+      quit  /exit 退出客户端
+
+      dbsize 返回当前数据库中所有key的数量
+
+      info 返回redis的相关信息
+
+      config get dir/* 实时传储收到的请求
+
+      flushdb 删除当前选择数据库中的所有key
+
+      flushall 删除所有数据库中的数据
+
+
+3）redis性能测试（benchmark是一个压力测试工具）
+
+redis-benchmark -h localhost -p 6379 -c 100 -n 100000
+
+
+4)redis 五大数据类型
+
+（1）string
+
+#追加字符串,如果name不存在，就相当于set一个name
+append name 'hello'
+
+#获取字符串的长度
+strlen name
+
+#自增
+incr name 
+
+#自减
+decr name
+
+#设置步长（增）
+incrby name 10
+
+#设置步长（减）
+decrby name 10
+
+#字符串范围（相当于Java的substring用法）0到-1表示取所有
+getrange name 0 -1
+
+#替换（替换指定位置开始的字符串）
+setrange name 1 xxx
+
+#设置过期时间
+setex（set with expire）
+setex name 30 "Liang WenHui"
+
+#不存在再进行设置,如果name存在,创建失败（分布式锁中常使用）
+setnx（set if not exist）
+setnx name "redis"
+
+#同时设置多个值
+mset name1 key1 name2 key2 name3 key3
+
+#同时获取多个值
+mget name1 name2 name3
+
+#对象(设置一个name：1对象 值为json字符来保存一个对象)
+set name：1{name：zhangsan,age:24}
+
+mset name:1:name zhangsan name:1:age 24
+
+
+（2）list
+
+#将一个或者多个值，插入到列表头部（左）
+lpush name "zhangsan"
+
+#获取list中的值
+lrange name 0 -1 （0到-1表示列出所有）
+lrange name 0 3 （0到3表示通过区间获取值）
+
+
+将一个或者多个值，插入到列表头部（右）
+rpush name "zhangsan"
+
+
+#移除list集合中第一个元素（lpop）
+lpop name
+
+#移除list集合中最后一个元素（rpop）
+rpop name
+
+#通过下标获取list集合中的某一个元素
+lindex name 3
+
+#返回列表长度
+llen name
+
+#移除list集合中指定个数的value，精准匹配
+lrem name count value
+
+#通过下标截取指定的长度，并list已经被改变（截断了只剩下的部分）
+ltrim name 0 3
+
+#移除列表中最后一个元素，并移动到新的列表中（lpoplpush 组合命令）
+rpoplpush name name1
+
+#将列表中指定下标的值替换为另外一个值，更新操作
+lset name 0 zhangsan（如果不存在列表更新会报错）
+
+#将某个具体的value插入列表指定的元素中前面或者后面
+linsert name after zhangshan lisi
+or
+linsert name before zhangshan lisi
+
+（3）set (set中的值不能重读的)
+
+#set集合中添加元素
+sadd name "zhangsan"
+
+#查看指定set中的所有值
+SMEMBERS name
+
+#判断某一个值是不是在set集合中
+SISMEMBER name "zhangsan"
+
+#获取set集合中内容元素的个数
+scard name
+
+#移除set集合中的指定元素
+srem name "zhangsan"
+
+#无需不重复集合，抽随机
+srandmember name
+
+#随机删除key
+spop name
+
+#将一个指定的值，移动到另一个set集合中
+smove name name1 key（这里的key指的是name的值）
+
+#差集
+sdiff name name1
+
+#交集（共同关注）
+sinter name name1
+
+#并集
+sunion name name1
+
+PS：功能点推荐，类似微博共同好友，推荐好友！
+
+（4）hash
+
+#set一个集体的key-value
+hset name filed zhangsan
+
+#获取一个字段
+hget name filed
+
+#set多个具体的key-value
+hmset name filed1 zhangsan field2 lisi
+
+#获取多个字段
+hmget name filed1 filed2
+
+#获取全部数据
+hgetall name
+
+#删除hash指定的key字段，对应的value值也就消失了
+hdel name filed
+
+#获取hash表的字段数量
+hlen name
+
+#判断hash中指定字段是否存在
+hexists name filed
+
+#只获取所有的filed
+hkeys name
+
+#只获取所有的value
+hvals name
+
+
+（5）zset
+
+#添加一个值
+zadd name zhangsan
+
+#添加多个值
+zadd name1 zhangsan name2 lisi
+
+#遍历
+zrange name 0 -1
+
+5）三种特殊数据类型
+geospatial
+hyperloglog
+bigmaps
+
+
+1）geospatial
+有效经纬度：
+经度：-180 ~ 180
+纬度：-85.05 ~ 85.05
+
+#添加地理位置（geoadd）
+geoadd china：city 116.40 39.90 beijing
+
+geodist（两点之间的距离）查看北京到深圳的直线距离
+m 表示单位为米
+km 表示单位为千米
+mi 表示单位为英里
+ft 表示单位为英尺
+geodist china：city beijing shenzhen km 
+
+geohash(返回一个或多个位置元素的geohash标识)
+该命令将返回11个字符的geohash字符串
+#将二维的经纬度转换为一维的字符串，如果两个字符串接近，那么则距离越近
+geohash china：city beijing shenzhen
+
+#获取指定的城市经度纬度（geopos）获取当前定位，一定是一个坐标值
+geopos china：city beijing
+
+georadius（以给定的经度纬度为中心，找出某一般半径内的元素）
+例如：我附近的人？（获取所有附近的人的地址，定位）通过半径来查询！
+获取指定数量的人 200？
+#以100 30为经纬度中心，寻找方圆1000km内的城市
+georadius  china:city 110 30 1000 km
+
+#显示他人的定位信息
+georadius china：city 100 30 500 km withcoord 
+
+
+#筛选出来的指定结果
+georadius china：city 100 30 500 km withcoord count 1
+
+
+georadiusbymember（找出位于指定元素周围的其它元素）
+georadiusbymember china:city shenzhen 500 km
+
+
+redis事务
+
+redis事务本质：一组命令的集合，一个事务中的所有命令都会被序列化，在事务执行过程中，会按照顺序执行！
+
+一次性，顺序性，排他性执行一些列的顺序！
+
+redis没有事务隔离级别的概念！
+
+所有的命令在事务当中，并没有直接被执行，只有发起执行命令的时候才会执行！Exec
+
+redis单条命令保存原子性，但是事务不保证原子性。
+
+redist的事务：
+
+事务开启（multi）> 命令队列（...）> 执行事务（exec）|| 取消事务（discard）
+
+注意：（常见的异常类型）
+
+1）编译型异常（代码有问题，命令有错），事务中所有的命令都不会被执行。
+
+2）运行时异常（1/0），如果事务中存在语法性错误，其他命令一样能够去执行，错误命令抛出异常。
+
+
+——————————————————————————————————————————————————————————————————————————————————————————————
+
+2022/02/27 搭建redis主从架构
+
+单节点redis的并发能力有限，要进一步提高Redis的并发能力，就需要搭建主从集群，实现读写分离。
+
+
+修改port 端口
+
+修改 dir 保存目录
+
+修改 replica-announce-ip 本地ip地址
+
+
+slaveof ip port  或者 replicaof ip port 
+
+
+数据同步的原理
+
+主从第一次同步是全量同步，但如果slave重启后同步，则执行增量同步
+
+
+简述全量同步的流程？
+
+1）slave 节点请求增量同步
+2）master 节点判断replid 发现不一致 增量同步
+3）master 将完整内存数据生成RDB,发送RDB到slave
+4）slave 清空本地数据，加载master的RDB
+5）master 将RDB期间的命令记录在repl_baklog,并持续将log中的命令发送给slave
+6）slave 执行接收到的命令，保持master之间的同步
+
+
+优化redis主从集群方案：
+1）在master节点中配置repl-diskless-sync yes启用无磁盘复制，避免全量同步时的磁盘IO（使用场景为网络带宽较好，磁盘不足时）
+2）redis单节点上限的占用不要太大，减少RDB导致的过多磁盘IO
+3）适当提高repl_baklog的大小，发现slave宕机时尽快实现故障恢复，尽可能避免全量同步
+4）限制一个master的slave节点数量，如果实在太多slave，则可以采用主-从-从链式结构，减少master压力
+
+
+redis哨兵
+
+哨兵（sentinel）的作用在于给redis提供主从集群自动故障恢复。
+
+1）监控：sentinel会不断检查master和slave是否按照预期工作。
+2）自动故障恢复：如果master故障，sentinel会将一个slave提升为master，当故障实例恢复后也以新的master为主
+3）通知：sentinel充当redis客户端的服务发现来源，当集群发生故障转移时，会将最新消息推送给reids的客户端
+
+sentinel如何判断一个redis实例是否健康？
+
+1）每隔1秒发送一次ping，如果超过一定时间没有相应则认为时主观下线。
+2）如果大多数sentinel都认为实例主观下线，则判定为服务下线。
+
+
+故障转移步骤有哪些？
+1）首先选定一个slave作为新的master，执行slaveof no one
+2）然后让所有节点都执行slaveof 新master
+3）修改故障节点配置，添加slaveof 新master
+
+
+
+#哨兵集群的配置文件sentinel.conf
+
+# 哨兵的端口号
+port 27003
+
+sentinel announce-ip 42.192.139.14
+
+# 配置哨兵的监控参数
+# 格式：sentinel monitor <master-name> <ip> <redis-port> <quorum>
+# master-name是为这个被监控的master起的名字
+# ip是被监控的master的IP或主机名。因为Docker容器之间可以使用容器名访问，所以这里写master节点的容器名
+# redis-port是被监控节点所监听的端口号
+# quorom设定了当几个哨兵判定这个节点失效后，才认为这个节点真的失效了
+sentinel monitor market-redis-group 42.192.139.14 6379 2
+
+# master在连续多长时间无法响应PING指令后，就会主观判定节点下线，默认是30秒
+# 格式：sentinel down-after-milliseconds <master-name> <milliseconds>
+sentinel down-after-milliseconds market-redis-group 5000
+
+sentinel failover-timeout market-redis-group 60000
+
+# 连接主节点的密码
+# 格式：sentinel auth-pass <master-name> <password>
+sentinel auth-pass market-redis-group asdfghjkl
+
+dir "./"
+
+
+#Java工程yml文件了解sentinel集群配置
+
+spring:
+  redis:
+  sentinel:
+      master: 集群名称
+      nodes： sentinelip地址:端口号,sentinelip地址:端口号,sentinelip地址:端口号

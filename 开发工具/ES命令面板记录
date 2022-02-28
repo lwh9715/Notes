@@ -1,0 +1,395 @@
+es 命令面板记录
+
+#查询所有
+GET /amos/_search
+{
+  "query": {
+    "match_all": {}
+  }
+}
+
+#全文检索
+
+GET /amos/_search
+{
+  "query": {
+    "match": {
+      "word": "00后少年为冬奥梦每天零下30度晨练"
+    }
+  }
+}
+
+
+GET /amos/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "影视",
+      "fields": ["word","mid"]
+    }
+  }
+}
+
+
+#精确查询
+
+GET /amos/_search
+{
+  "query": {
+    "term": {
+      "iconDesc": {
+        "value": "爆"
+      }
+    }
+  }
+}
+
+GET /amos/_search
+{
+  "query": {
+    "range": {
+      "onboardTime": {
+        "gte": 163936417000,
+        "lte": 1639364187000
+      }
+    }
+  }
+}
+
+
+#复合查询
+
+GET /amos/_search
+{
+  "query": {
+    "function_score": {
+      "query": {
+        "match": {
+          "iconDesc": "爆"
+        }
+      },
+      "functions": [
+        {
+          "filter": {
+            "term": {
+              "category": "国内要闻"
+            }
+          },
+          "weight": 10
+        }
+      ],
+      "boost_mode": "sum"
+    }
+  }
+}
+
+#Boolean query查询
+GET /amos/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "iconDesc": {
+              "value": "爆"
+            }
+          }
+        }
+      ],
+      "should": [
+        {
+          "term": {
+            "category": {
+              "value": "游戏"
+            }
+          }
+        },
+        {
+          "term": {
+            "category": {
+              "value": "音乐"
+            }
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "term": {
+            "category": {
+              "value": "社会新闻"
+            }
+          }
+        },
+        {
+          "term": {
+            "category": {
+              "value": "国内要闻"
+            }
+          }
+        }
+      ],
+      "filter": [
+        {
+          "term": {
+            "category": "艺人"
+          }
+        }
+      ]
+    }
+  }
+}
+
+
+
+#排序
+GET /amos/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "sort": [
+    {
+      "iconDesc": {
+        "order": "asc"
+      }
+    },
+        {
+      "category": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+#分页
+GET /amos/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 8000, 
+  "size": 2, 
+  "sort": [
+    {
+      "iconDesc": {
+        "order": "asc"
+      }
+    },
+        {
+      "category": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+
+
+#分页
+GET /amos/_search
+{
+  "query": {
+    "match": {
+      "category": "艺人"
+    }
+  },
+  "highlight": {
+    "fields": {
+      "category": {
+        "pre_tags": "<em>",
+        "post_tags": "</em>"
+      },
+      "word": {
+        "pre_tags": "<em>",
+        "post_tags": "</em>"
+      }
+    }
+  }
+}
+
+
+#聚合功能
+
+GET /amos/_search
+{
+  "query": {
+    "range": {
+      "onboardTime": {
+        "gte": 1639364187000
+      }
+    }
+  }, 
+  "size": 0,
+  "aggs": {
+    "categoryAgg": {
+      "terms": {
+        "field": "category",
+        "size": 100
+      }
+    }
+  }
+}
+
+
+
+
+#嵌套聚合metric
+
+GET /amos/_search
+{
+  "size": 0,
+  "aggs": {
+    "categoryAgg": {
+      "terms": {
+        "field": "category",
+        "size": 5
+      },
+      "aggs": {
+        "rawHotAgg": {
+          "stats": {
+            "field": "realPos"
+          }
+        }
+      }
+    }
+  }
+}
+
+
+
+POST _analyze
+{
+  "text": "外来的媳妇本地郎-梁文辉的",
+  "analyzer": "ik_max_word"
+}
+
+#插入索引库
+PUT /amos
+{
+  "mappings": {
+    "properties": {
+      "info": {
+        "type": "text",
+        "analyzer": "ik_max_word"
+      },
+      "email": {
+        "type": "keyword",
+        "index": false
+      },
+      "name": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "keyword",
+            "index": false
+          }
+        }
+      }
+    }
+  }
+}
+
+#查询索引库
+GET /amos
+
+##删除索引库
+DELETE /amos
+
+#插入文档
+POST /amos/_doc/a1
+{
+  "info":"liangwenhui振作起来",
+  "email":"lwh9715@gmail.com",
+  "name":{
+    "firstname":"wenhui",
+    "lastname":"liang"
+  }
+}
+
+#查询文档
+GET /amos
+
+#查询文档
+DELETE /amos/_doc/4721992991510136
+
+#修改文档
+POST /amos/_update/a1
+{
+  "doc": {
+      "info":"liangwenhui振作",
+      "email":"lwx768561@gmail.com" 
+  }
+}
+
+#创建索引库
+PUT /amos
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "py_analyzer": {
+          "tokenizer": "ik_max_word",
+          "filter": "py"
+        }
+      },
+      "filter": {
+        "py": {
+          "type": "pinyin",
+          "keep_full_pinyin": false,
+          "keep_joined_full_pinyin": true,
+          "keep_original": true,
+          "limit_first_letter_length": 16,
+          "remove_duplicated_term": true,
+          "none_chinese_pinyin_tokenizer": false
+        }
+      }
+    }
+  },
+  "mappings": {
+    "properties": {
+      "word": {
+        "type": "text",
+        "analyzer": "py_analyzer",
+        "search_analyzer": "ik_max_word"
+      },
+      "category": {
+        "type": "keyword"
+      },
+      "realPos": {
+        "type": "long",
+        "index": false
+      },
+      "rawHot": {
+        "type": "long",
+        "index": false
+      },
+      "mid": {
+        "type": "keyword"
+      },
+      "onboardTime": {
+        "type": "keyword"
+      },
+      "iconDesc": {
+        "type": "keyword"
+      },
+      "isFlag": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+
+
+
+# 使用拼音插件进行分词
+GET /_analyze
+{
+  "text": ["白日梦想家"],
+  "analyzer": "pinyin"
+}
+
+
+
+
+
+
