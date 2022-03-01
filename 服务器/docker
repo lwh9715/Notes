@@ -262,6 +262,19 @@ redis-sentinel \
 38）docker 方式启动redis
 
 docker run -p 6379:6379 --name redis \
--v /usr/local/redis.conf:/etc/redis/redis.conf \
--v /usr/local/data:/data \
+-v /home/redis/6379/redis.conf:/etc/redis/redis.conf \
+-v /home/redis/6379/data:/data \
 -d redis redis-server /etc/redis/redis.conf
+
+
+39）docker 启动redis分片集群命令
+
+docker run -p 6377:6377 -p 16377:16377 --name master-6377 -v /home/redis/6377/redis.conf:/etc/redis/redis.conf -v /home/redis/6377/data:/data -d redis redis-server /etc/redis/redis.conf
+
+Ps：-p 16377:16377 为集群总线,单开6377是无法进行集群搭建
+
+40）docker 搭建redis分片集群命令
+
+docker exec -it master-6379 redis-cli -a asdfghjkl --cluster create --cluster-replicas 1 42.192.139.14:6377 42.192.139.14:6378 42.192.139.14:6379 120.77.239.151:6377 120.77.239.151:6378 120.77.239.151:6379
+
+Ps：-a asdfghjkl 为连接redis的命令

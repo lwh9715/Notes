@@ -400,3 +400,68 @@ spring:
   sentinel:
       master: 集群名称
       nodes： sentinelip地址:端口号,sentinelip地址:端口号,sentinelip地址:端口号
+
+
+
+2022/02/28  redis分片集群
+
+1）搭建分片集群
+
+主从和哨兵可以解决高可用，高并发读的问题，但是依然有些问题没有解决：
+
+海量数据存储问题
+高并发写的问题
+
+使用分片集群可以解决上述问题，分片集群特征：
+1、集群中有多个master，每个master保存不同的数据
+2、每个master都可以有多个slave节点
+3、master之间通过ping监控彼此健康状态
+4、客户端请求可以访问集群任意节点，最终都会被转发到正确节点
+
+
+2）散列插槽
+
+redis会把每一个master节点映射到0~16393共16384个插槽（hast slot）上，查看集群信息就能看到
+
+redis如何判断某个key应该在那个实例？
+1、将16384个插槽分配到不同的实例
+2、根据key的有效部分计算哈希值，对16384取余
+3、余数作为插槽，寻找插槽所在实例即可
+
+如何将同一类数据固定的保存在一个redis实例？
+
+1、这一类数据使用相同的有效部分，例如key都以{user}为前缀
+
+3）集群伸缩
+
+添加一个节点到集群
+
+redis-cli --cluster help 查看帮助命令
+
+redis-cli --cluster add-node 新增节点ip：端口 集群中随即一台masterip：端口
+
+redis-cli --cluster reshard 重新分配插槽的ip：端口
+
+redis-cli -p 端口 cluster nodes 查看分片集群插槽信息
+
+
+4）故障转移
+
+利用cluster failover 命令可以手动让集群中的某个master宕机，切换到执行cluster failover 命令的这个slave节点上，实现无感知的数据迁移。
+
+手动的failover支持三种不同模式：
+缺省：默认的流程
+force：省略了对offset的一致性校验
+takeover：直接执行第5步，忽略数据一致性，忽略master状态和其他master的意见
+
+5）redisTemplate 访问分片集群
+
+配置yml文件
+
+spring:
+  redis:
+    cluster:
+      nodes:
+        - 节点ip：端口
+        - 节点ip：端口
+        - 节点ip：端口
