@@ -1,0 +1,7 @@
+@Controller//表明这是一个SpringMVC的Controller
+@Configuration//通过注解表明该类是一个spring配置，相当于一个xml文件
+@Component//标识一个受spring管理的组件
+@Service//标识一个业务层的组件
+@Repository//标识一个持久层的组件
+@Qualifter("")//指定具体要装配到组件的id值
+@PathBaariable//映射请求url中占位符到请求处理方法的传参

@@ -1,0 +1,8 @@
+spring cloud
+
+spring boot 和 spring cloud 的却别和理解：
+
+springboot 专注于快速方便的开发单个个体微服务。
+spring cloud是关注全局微服务协调整理治理框架，它将spring boot开发的单个个体微服务整合起来管理，为各个微服务之间提供，配置管理，服务发现，断路器，路由，微代理，事件总线，全局锁，决策竞选，分布式会话等集成服务。
+
+总结：spring boot专注于快速，方便的开发单个个体服务，spring cloud则是关注全局的服务治理框架。
