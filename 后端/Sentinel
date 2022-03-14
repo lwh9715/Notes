@@ -179,4 +179,48 @@ feign:
   统计指定时间内的调用，如果调用次数超过指定请求数，并且出现异常的比例达到设定的比例阈值（或超出指定异常数），则会触发熔断。
 
 
+7）授权规则
 
+白名单：来源在白名单内的调用者允许访问
+黑名单：来源在黑名单内的调用者不允许访问
+
+1、在gateway网关服务yml文件配置
+
+gateway:
+  default-filters:
+    - AddRequestHeader=origin,gateway
+
+2、在对应的服务实现RequestOriginParser类
+
+/**
+ * @description:判断请求头部是否带有origin
+ * @author: Amos
+ * @email: lwh9715@gmail.com
+ * @date: 2022/3/14 22:13
+ */
+@Component
+public class HeaderOriginParser implements RequestOriginParser {
+
+    @Override
+    public String parseOrigin(HttpServletRequest httpServletRequest) {
+        //获取请求头
+        String origin = httpServletRequest.getHeader("origin");
+        //非空判断
+        if (StringUtils.isEmpty(origin)) {
+            origin = "blank";
+        }
+        return origin;
+    }
+}
+
+
+8）自定义异常处理
+
+默认情况下,发生限流|降级|授权拦截时,都会抛出异常到调用方,如果要自定义异常时的返回结果,需要实现blockExceptionHandler接口
+
+常见异常：
+1、FlowException 限流异常
+2、ParamFlowException  热点参数限流异常
+3、DegradeException  降级异常
+4、AuthorityException  授权规则异常
+5、SystemBlockException  系统规则异常 

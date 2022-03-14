@@ -180,7 +180,7 @@ docker load -i nginx.tar
 
 31)docker 启动配置启动nginx https模式命令
 
-docker run -d --name nginx -p 80:80 -p 443:443 -v /home/nginx:/etc/nginx nginx
+docker run -d --name nginx -p 80:80 -p 443:443 -v /home/nginx:/etc/nginx -v /usr/share/nginx:/usr/share/nginx nginx
 
 小坑:上次因为没有配443端口，跳转之后一直访问不了https
 
@@ -278,3 +278,10 @@ Ps：-p 16377:16377 为集群总线,单开6377是无法进行集群搭建
 docker exec -it master-6379 redis-cli -a asdfghjkl --cluster create --cluster-replicas 1 42.192.139.14:6377 42.192.139.14:6378 42.192.139.14:6379 120.77.239.151:6377 120.77.239.151:6378 120.77.239.151:6379
 
 Ps：-a asdfghjkl 为连接redis的命令
+
+
+41）docker 启动sentinel监控
+
+docker run -d --name sentinel -p 8179:8179 \
+-v /home/sentinel/sentinel-dashboard-1.8.1.jar:/usr/sentinel-dashboard-1.8.1.jar java:8 \
+java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar -Dserver.port=8179
