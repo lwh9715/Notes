@@ -579,3 +579,129 @@ public void listenerQueue4(String msg) {
 2、性能受限于磁盘IO
 
 MQ集群
+
+
+1）集群分类
+
+RabbitMQ 是基于Erlang语言编写，二Erlang又是一个面向并发的语言，天然支持集群模式，rabbitMQ的集群有两种模式：
+普通集群：是一种分布式集群，将队列分散到集群的各个节点，从而提高整个集群的并发能力
+镜像集群：是一种主从集群，普通集群的基础上，添加主从备份功能，提高集群的数据可用性
+
+镜像集群虽然支持只从，但支持同步并不是强一致，某些情况下可能有数据丢失的风险，因此在rabbitMQ的3.8版本以后，推出了新功能，仲裁队列来代替镜像集群，底层采用raft协议确保主从数据的一致性。
+
+2）普通集群
+
+普通集群又称标准集群，具备以下特征：
+	会在集群的各个节点间共享部分数据，包括：交换机，队列元信息。不包含队列中的消息
+	当访问集群某节点时，如果队列不在该节点，会从数据所在节点传递到当前节点并返回
+	队列所在节点宕机，队列中的消息就会消失
+
+搭建普通集群的步骤：
+
+步骤一、获取cookie
+
+由于rabbit MQ基于erlang语言编写，需要获取到cookie值作为集群节点的通行密码。
+
+1、从之前启动的rabbitMQ容器获取cookie值
+
+docker exec -it mq cat /var/lib/rabbitmq/.erlang.cookie
+
+2、准备rabbitmq.conf配置文件
+
+#禁用默认账号
+loopback_users.guest = false
+listeners.tcp.default = 5672
+cluster_formation.peer_discovery_backend = rabbit_peer_discovery_classic_config
+cluster_formation.classic_config.node.1 = rabbit@mq1
+cluster_formation.classic_config.node.2 = rabbit@mq2
+cluster_formation.classic_config.node.3 = rabbit@mq3
+
+
+3、创建.erlang.cookie，并设置权限
+
+echo "cookie值" > .erlang.cookie
+
+chmod 600 .erlang.cookie
+
+4、分别将rabbitmq.conf配置文件和.erlang.cookie文件拷贝启动mq目录
+
+
+5、启动集群-创建网络
+
+docker network create mq-net
+
+6、启动命令
+
+docker run -d --net mq-net \
+-v /home/rabbitmq/rabbit.conf:/etc/rabbitmq/rabbitmq.conf \
+-v /home/rabbitmq/.erlang.cookie:/var/lib/rabbitmq/.erlang.cookie \
+-e RABBITMQ_DEFAULT_USER=relax \
+-e RABBITMQ_DEFAULT_PASS=relax \
+--name mq1 \
+--hostname mq1 \
+-p 5672:5672 \
+-p 15672:15672 \
+8b4241a5d928
+
+
+3）镜像集群
+
+镜像集群：本质是主从模式，具备以下特征：
+	交换机，队列，队列中的消息会在各个mq的镜像节点之间同步备份
+	创建队列的节点被称为该队列的主节点，备份到其他节点叫做该队列的镜像节点
+	一个队列的主节点可能是另一个队列的镜像节点
+	所有操作都是主节点完成的，然后同步给镜像节点
+	主节点宕机，镜像节点会替代成新的主
+
+
+搭建镜像集群的步骤：
+
+1、只需要在普通集群中任意一个节点输入以下命令即可
+
+rabbitmqctl set_policy ha-two "^two\." '{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"}'
+
+rabbitmqctl set_policy 固定写法
+ha-two	策略名称，自定义
+"^two\." 匹配队列的正则表达式，符合命名规则的队列才生效，这里是任何以two.开头的队列名称
+
+{"ha-mode":"exactly","ha-params":2,"ha-sync-mode":"automatic"} 策略内容
+"ha-mode":"exactly" 策略模式 此处是exactly模式，指定副本数量
+"ha-params":2 策略参数，这里是2，就是副本数量为2，1主1从
+"ha-sync-mode":"automatic" 同步策略，
+默认是manual，即新加入的镜像节点不会同步旧的消息
+如果是automatic，则新加入的镜像节点会把主节点中所有消息都同步，会带来额外的网络开销
+
+4）仲裁队列
+
+仲裁队列是3.8版本以后才有的新功能，用来替代镜像队列，具备以下特征：
+	与镜像队列一样，都是主从模式，支持主从数据同步
+	使用简单，没有复杂的配置
+	主从同步基于raft协议，强一致
+
+配置方式一
+
+在rabbitmq管理面板新建队列时选择quorum模式即可
+
+
+配置方式二
+
+SpringAMQP创建仲裁队列：
+
+/**
+ * quorum 仲裁队列
+ * @return
+ */
+@Bean
+public Queue quorumQueue() {
+    return QueueBuilder.durable("quorum.queue").quorum().build();
+}
+
+
+SpringAMQP连接集群，只需要在yaml文件中配置即可
+
+spring:
+  rabbitmq:
+    addresses: 120.77.239.151:5672, 120.77.239.151:5672, 120.77.239.151:5672
+    username: guest  #用户名
+    password: guest #密码
+    virtual-host: / #虚拟主机
