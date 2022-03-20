@@ -5,7 +5,7 @@ rabbitMQ
 1）耦合度低
 2）吞吐量提升
 3）故障隔离
-4)流量削峰
+4）流量削峰
 
 异步通信的缺点：
 
@@ -66,7 +66,7 @@ Topic Exchange （主题）
 注：以上两个是rabbitmq官方文档的连接mq方法，springAMQP将这些都封装好了，拿来即用（rabbitTemplate）
 
 
-springAMQP
+SpringAMQP
 
 什么是AMQP?
 
@@ -90,10 +90,10 @@ work queue工作队列，可以提高消息处理是速度，避免消息队列�
 修改preFetch这个值，可以控制预取消费消息的上限
 
 spring:
-	rabbitmq:
-		listener:
-			simple:
-				prefetch: 1 #每次只能获取一条消息，处理完成才能获取下一个消息
+  rabbitmq:
+      listener:
+            simple:
+              prefetch: 1 #每次只能获取一条消息，处理完成才能获取下一个消息
 
 
 
@@ -194,10 +194,9 @@ Spring-AMQP 消息转换器
 Spring-AMQP中消息的序列化和反序列化时怎么实现的？
 
 1）利用MessageConverter实现的，默认时jdk序列化
-2）注意发送方和接收方必须使用相同的MessageConverter
-
-1）在消息发送服务端引入依赖(jackson-dataformat-xml)
 2）在消息发送服务端主方法声明MessageConverter
+3）注意发送方和接收方必须使用相同的MessageConverter
+4）在消息发送服务端引入依赖(jackson-dataformat-xml)
 
 @Bean
 public MessageConverter jsonMessageConverter(){
@@ -509,8 +508,8 @@ rabbitTemplate.convertAndSend("delay.direct", "delay", message, correlationData)
 
 
 延迟队列插件的使用步骤包括哪些？
-声明一个交换机，添加delayed属性为true
-发送消息时，添加x-delay头，值为超时时间
+1）声明一个交换机，添加delayed属性为true
+2）发送消息时，添加x-delay头，值为超时时间
 
 惰性队列
 
@@ -612,9 +611,9 @@ docker exec -it mq cat /var/lib/rabbitmq/.erlang.cookie
 loopback_users.guest = false
 listeners.tcp.default = 5672
 cluster_formation.peer_discovery_backend = rabbit_peer_discovery_classic_config
-cluster_formation.classic_config.node.1 = rabbit@mq1
-cluster_formation.classic_config.node.2 = rabbit@mq2
-cluster_formation.classic_config.node.3 = rabbit@mq3
+cluster_formation.classic_config.nodes.1 = rabbit@mq1
+cluster_formation.classic_config.nodes.2 = rabbit@mq2
+cluster_formation.classic_config.nodes.3 = rabbit@mq3
 
 
 3、创建.erlang.cookie，并设置权限
@@ -632,16 +631,22 @@ docker network create mq-net
 
 6、启动命令
 
-docker run -d --net mq-net \
--v /home/rabbitmq/rabbit.conf:/etc/rabbitmq/rabbitmq.conf \
--v /home/rabbitmq/.erlang.cookie:/var/lib/rabbitmq/.erlang.cookie \
--e RABBITMQ_DEFAULT_USER=relax \
--e RABBITMQ_DEFAULT_PASS=relax \
---name mq1 \
---hostname mq1 \
--p 5672:5672 \
+docker run  -d --hostname rabbitmq3 \
+--add-host rabbitmq2:42.192.139.14 \
+--add-host rabbitmq1:106.13.27.74 \
+--restart unless-stopped \
+--name rabbitmq3 \
+--net mq-net \
+-p 4369:4369 \
+-p 25672:25672 \
 -p 15672:15672 \
-8b4241a5d928
+-p 5672:5672 \
+-e RABBITMQ_DEFAULT_USER=root \
+-e RABBITMQ_DEFAULT_PASS=liangwenhui \
+-v mq-plugins:/plugins \
+-v /home/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf \
+-v /home/rabbitmq/.erlang.cookie:/var/lib/rabbitmq/.erlang.cookie \
+4b5f4b2a3227
 
 
 3）镜像集群
