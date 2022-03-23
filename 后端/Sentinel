@@ -46,10 +46,12 @@ QPS：指的是每秒的请求数
 2、配置控制台地址
 
 cloud:
-sentinel:
-  transport:
-    dashboard: 120.77.239.151:8080
-
+sentinel: #配置sentinel
+      transport:
+        dashboard: 106.13.27.74:8179  #指定sentinel dashboard web 地址
+        clientIp: 42.192.139.14 #指定和控制台通信的IP，若不配置，会自动选择一个IP注册
+        port: 5002  #指定sentinel组件与sentinel dashboard组件通信地址8719
+        
 3、访问微服务的任意端点，触发sentinel监控
 
 
@@ -256,3 +258,6 @@ public class SentinelBlockHandler implements BlockExceptionHandler {
 
     }
 }
+
+
+
