@@ -318,7 +318,6 @@ redist的事务：
 
 修改 replica-announce-ip 本地ip地址
 
-
 slaveof ip port  或者 replicaof ip port 
 
 
@@ -407,6 +406,17 @@ spring:
 
 1）搭建分片集群
 
+redis.conf主要修改以下几个配置即可
+
+port 端口
+#开启集群功能
+cluster-enabled yes
+#让redis后台运行
+daemonize yes
+注册的实例ip
+replica-announce-ip IP地址
+
+
 主从和哨兵可以解决高可用，高并发读的问题，但是依然有些问题没有解决：
 
 海量数据存储问题
@@ -465,3 +475,27 @@ spring:
         - 节点ip：端口
         - 节点ip：端口
         - 节点ip：端口
+
+
+6）redis 淘汰机制
+
+  1、redis为什么要有淘汰机制？
+  redis淘汰机制的存在是为了更好的使用内存，用一定的缓存丢失来换取内存的使用效率。
+
+  2、redis有两种过期策略，定期删除和惰性删除
+  定期删除：redis每个100ms随机抽取一些设置了过期时间的key，检查其是否过期，如果过期就删除。
+  惰性删除：在获取某个key的时候，redis检查一下，如果该key设置了过期时间则判断该过期时间是否已经过期，
+  如果过期了就直接删掉并不返回任何东西。
+
+  3、redis的内存淘汰机制
+  当redis内存快耗尽时，redis会启动内存淘汰机制，将部分key清掉以腾出内存。
+  redis提供6中数据淘汰策略，可在redis.conf中配置：maxmemory-policy noeviction
+  noeviction：禁止驱逐数据。默认配置都是这个。当内存使用达到阀值的时候，所有引起申请内存的命令都会报错。
+  volatile-lru：从设置了过期时间的数据集中挑选最近最少使用的数据淘汰。
+  volatile-ttl：从已设置了过期时间的数据集中挑选即将要过期的数据淘汰。
+  volatile-random：从已设置了过期时间的数据集中任意选择数据淘汰。
+  allkeys-lru：从数据集中挑选最近最少使用的数据淘汰。
+  allkeys-random：从数据集中任意选择数据淘汰。
+
+  Tips:
+  当Redis确定好要驱逐某个键值对后，会删除这个数据，并将这个数据变更消息同步到本地和从机。

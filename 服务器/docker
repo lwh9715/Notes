@@ -285,3 +285,8 @@ Ps：-a asdfghjkl 为连接redis的命令
 docker run -d --name sentinel -p 8179:8179 \
 -v /home/sentinel/sentinel-dashboard-1.8.1.jar:/usr/sentinel-dashboard-1.8.1.jar java:8 \
 java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar -Dserver.port=8179
+
+
+42）docker 时间同步问题（挂载服务器本地时间即可）
+
+-v /etc/localtime:/etc/localtime:ro
