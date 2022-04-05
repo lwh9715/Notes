@@ -1,0 +1,7 @@
+1)#
+<!-- 1.当用户链接时，void(0)计算为0,用户点击不会发生任何效果 -->
+<a href="javascript:void(0);">单击此处什么都不会发生</a><br>
+
+<!-- 2.执行 void() 操作符中的代码 -->
+<a href="javascript:void(alert('还真点啊你，真听话！！！哈哈哈！！！'))">点我弹出警告框!!!</a><br>
+<a href="javascript:void(console.log('还真点啊你，真听话！！！哈哈哈！！！'))">点我输出到控制台!!!</a><br>

@@ -1,25 +1,19 @@
-HTML图片
-HTML图像使用<img>标签定义。
+1)#<！DOCTYPE>声明
+该<!DOCTYPE>声明代表文档类型，并有助于浏览器正确显示网页。
+它只能在页面顶部（在任何HTML标记之前）出现一次。
+该<!DOCTYPE>声明不区分大小写。
+<!DOCTYPE>HTML5 的声明为：
+<!DOCTYPE html>
 
-源文件（src），替代文本（alt） width，和height作为属性提供：
+2)#标题属性
+该title属性定义有关元素的一些额外信息。
 
-例
-<img src="w3schools.jpg" alt="W3Schools.com" width="104" height="142">	
-
-HTML链接
-HTML链接使用<a>标记定义：
-
-例
-<a href="https://www.w3schools.com">This is a link</a>
-
-HTML段落
-HTML段落使用<p>标记定义：
+当您将鼠标悬停在元素上时，title属性的值将显示为工具提示：
 
 例
-<p>This is a paragraph.</p>
-<p>This is another paragraph.</p>
+<p title="I'm a tooltip">This is a paragraph.</p>
 
-HTML标题
+3)#HTML标题
 HTML标题是使用<h1>to <h6>标记定义的。
 
 <h1>定义最重要的标题。<h6>定义了最不重要的标题： 
@@ -29,38 +23,27 @@ HTML标题是使用<h1>to <h6>标记定义的。
 <h2>This is heading 2</h2>
 <h3>This is heading 3</h3>
 
-
-<！DOCTYPE>声明
-该<!DOCTYPE>声明代表文档类型，并有助于浏览器正确显示网页。
-
-它只能在页面顶部（在任何HTML标记之前）出现一次。
-
-该<!DOCTYPE>声明不区分大小写。
-
-<!DOCTYPE>HTML5 的声明为：
-
-<!DOCTYPE html>
-
-
-标题属性
-该title属性定义有关元素的一些额外信息。
-
-当您将鼠标悬停在元素上时，title属性的值将显示为工具提示：
+4)#HTML段落
+HTML段落使用<p>标记定义：
 
 例
-<p title="I'm a tooltip">This is a paragraph.</p>
+<p>This is a paragraph.</p>
+<p>This is another paragraph.</p>
+
+5)#HTML链接
+HTML链接使用<a>标记定义：
+
+例:<a href="https://www.w3schools.com">This is a link</a>
+
+6)#HTML图片
+HTML图像使用<img>标签定义。
+
+源文件（src），替代文本（alt） width，和height作为属性提供：
+
+例:<img src="w3schools.jpg" alt="W3Schools.com" width="104" height="142">	
 
 
-
-使用该style属性来样式化HTML元素
-使用background-color的背景颜色
-使用color的文字颜色
-使用font-family的文字字体
-使用font-size文本大小
-使用text-align文本对齐
-
-
-格式化元素预先显示特殊类型的文本：
+7)#格式化元素预先显示特殊类型的文本：
 
 <b> -粗体文字
 <strong> -重要文字
@@ -73,47 +56,18 @@ HTML标题是使用<h1>to <h6>标记定义的。
 <sub> -下标文字
 <sup> -上标文字
 
-
-HTML <blockquote>报价
-HTML <blockquote>元素定义了引用另一个来源的部分。
-
-浏览器通常缩进<blockquote>元素。
-
-
-使用HTML style属性进行内联样式
-使用HTML <style>元素定义内部CSS
-使用HTML <link>元素引用外部CSS文件
-使用HTML <head>元素存储<style>和<link>元素
-将CSS color属性用作文本颜色
-将CSS font-family属性用作文本字体
-使用CSS font-size属性设置文字大小
-使用CSS border属性设置边框
-使用CSS padding属性在边框内留出空间
-将CSS margin属性用作边框外的空间 
-
-
-该target属性指定在何处打开链接的文档。
-
+8)#该target属性指定在何处打开链接的文档。
 该target属性可以具有以下值之一：
+_self	类别。在与预设相同的窗口/选项卡中打开文档
+_blank	在新窗口或标签中打开文档
+_parent	在父框架中打开文档
+_top	在整个窗口中打开文档 
 
-_self-类别。在与预设相同的窗口/选项卡中打开文档
-_blank -在新窗口或标签中打开文档
-_parent -在父框架中打开文档
-_top -在整个窗口中打开文档 
+9)#事件：回车触发事件
+@keyup.enter
 
-
-<!-- 1.当用户链接时，void(0)计算为0,用户点击不会发生任何效果 -->
-<a href="javascript:void(0);">单击此处什么都不会发生</a><br>
-
-<!-- 2.执行 void() 操作符中的代码 -->
-<a href="javascript:void(alert('还真点啊你，真听话！！！哈哈哈！！！'))">点我弹出警告框!!!</a><br>
-<a href="javascript:void(console.log('还真点啊你，真听话！！！哈哈哈！！！'))">点我输出到控制台!!!</a><br>
-
-
-
-事件：@keyup.enter
-回车触发事件
-
-
-#表示权重
+10)#表示权重
 !important
+
+11)#空格标签
+&nbsp;

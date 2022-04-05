@@ -384,6 +384,7 @@ RepublishMessageRecoverer 重试耗尽后，将失败消息投递到指定的交
 2）TTL
 
 TTL，也就是Time-To-Live，如果一个队列中的消息TTL结束仍未消费，则会变成为死信，ttl超时分为两种情况：
+
 	消息所在队列设置了存活时间
 	消息本身设置了存活时间
 
@@ -477,9 +478,9 @@ DelayExchange的本质还是官方的第三种交换机，只是添加了延迟�
  * @param msg
  */
 @RabbitListener(bindings = @QueueBinding(
-        value = @Queue(value = "dl.queue", durable = "true"),
-        exchange = @Exchange(name = "dl.direct",delayed = "true"),
-        key = "dl"
+        value = @Queue(value = "delay.queue", durable = "true"),
+        exchange = @Exchange(name = "delay.direct",delayed = "true"),
+        key = "delay"
 ))
 public void listenerQueue2(String msg) {
     log.info("消费者接收到的dl.direct死信交换机延迟队列消息:" + msg);
@@ -490,7 +491,7 @@ public void listenerQueue2(String msg) {
 @Bean
 public DirectExchange ttlDirectExchange() {
     //设置delay属性为true
-    return ExchangeBuilder.directExchange("ttl.direct")
+    return ExchangeBuilder.directExchange("delay.direct")
             .delayed()
             .durable(true)
             .build();

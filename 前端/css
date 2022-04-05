@@ -1,0 +1,20 @@
+1)#
+使用该style属性来样式化HTML元素
+使用background-color的背景颜色
+使用color的文字颜色
+使用font-family的文字字体
+使用font-size文本大小
+使用text-align文本对齐
+
+
+2)#
+使用HTML style属性进行内联样式
+使用HTML <style>元素定义内部CSS
+使用HTML <link>元素引用外部CSS文件
+使用HTML <head>元素存储<style>和<link>元素
+将CSS color属性用作文本颜色
+将CSS font-family属性用作文本字体
+使用CSS font-size属性设置文字大小
+使用CSS border属性设置边框
+使用CSS padding属性在边框内留出空间
+将CSS margin属性用作边框外的空间 
