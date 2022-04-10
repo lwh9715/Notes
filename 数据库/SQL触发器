@@ -1,0 +1,124 @@
+一、#Mysql触发器概述
+触发器是一种由事件自动触发执行的特殊存储过程，这些事件可以是对一个表进行 INSERT、UPDATE、DELETE 等操作。
+触发器经常用于加强数据的完整性约束和业务规则上的约束等。
+
+
+#查看触发器
+select * from information_schema.triggers
+
+
+#触发器语法
+
+CREATE TRIGGER 触发器名称
+{BEFORE|AFTER} {INSERT|UPDATE|DELETE} ON 表名称
+FOR EACH ROW
+触发器执行语句块;
+
+语法解释：
+{BEFORE|AFTER} 表示触发的事件，BEFORE表示在事件之前触发，AFTER表示在事件之后触发
+{INSERT|UPDATE|DELETE} 表示触发的事件
+触发器执行语句块	可以是单条sql语句，也可以是由begin...end结构组成的复合语句块
+
+#创建触发器
+
+CREATE TRIGGER hello_trigger
+BEFORE INSERT ON hello_table
+FOR EACH ROW
+BEGIN
+	INSERT INTO hello_table_log (log) VALUES ('触发器执行了...');
+END;
+
+#查看触发器
+
+SHOW TRIGGERS
+
+SHOW CREATE TRIGGER 触发器名称
+
+#删除触发器
+
+DROP TRIGGER IF EXISTS 触发器名称 ON 表名称
+
+
+
+
+二、#Psql触发器概述
+
+
+#创建触发器的步骤
+1）先为触发器建一个执行函数，函数的返回类型为触发器类型trigger，然后即可创建相应的触发器。
+2）例如当删除学生表(student)中的一条记录时，把这个学生在成绩表 (score) 中的成绩记录也删除掉，这时就可以使用触发器。
+
+#触发器函数
+
+示例如下:
+create function sentence_insert() returns trigger
+as
+$$
+BEGIN
+    IF (new.id > 4000) THEN
+        insert into tbl_sentence_log(content) values (session_user);
+        return new;
+    ELSEIF (new.id < 4000) THEN
+        RAISE EXCEPTION '不允许加入 command % is disabled', now();
+    END IF;
+END
+$$
+    language plpgsql;
+
+
+#触发器语法
+
+CREATE [OR REPLACE] TRIGGER TRIGGER_NAME
+{BEFORE | AFTER} TRIGGER_EVENT
+ON TABLE_NAME
+[FOR EACH ROW]
+[WHEN TRIGGER_CONDITION]
+TRIGGER_BODY
+
+语法解释：
+TRIGGER_NAME  触发器名称
+BEFORE | AFTER  指定触发器是在触发事件发生之前触发或者发生之后触发
+TRIGGER_EVENT 触发事件,在DML触发器中主要为INSERT、UPDATE、DELETE等
+TABLE_NAME  表名,表示发生触发器作用的对象
+FOR EACH ROW  指定创建的是行级触发器,若没有该子句则创建的是语句级触发器
+WHEN TRIGGER_CONDITION  添加的触发条件
+TRIGGER_BODY  触发体,是标准的PL/SQL语句块
+
+创建触发器示例：
+CREATE TRIGGER INSERT_TRIGGER
+AFTER INSERT ON TBL_SENTENCE
+FOR EACH ROW
+EXECUTE PROCEDURE SENTENCE_INSERT();
+
+
+#语句级触发器与行级触发器
+语句级的触发器是指执行每个 SQL 时，只执行一次，行级触发器则指每行都会执行一次。
+一个修改零行的操作会导致合适的语句级触发器被执行，但不会触发行级触发器。
+批量插入时，语句级别的触发器只触发一次，不管 affected row 是否为 0，但是行级触发器的触发次数为 affected row。
+
+
+#BEFORE 触发器与 AFTER 触发器
+语句级别的 BEFORE 触发器是在语句开始做任何事情之前就被触发了，而语句级别的 AFTER 触发器是在语句结束时才触发的。
+行级别的 BEFORE 触发器在对特定行进行操作之前触发，而行级别的 AFTER 触发器是在语句结束时才触发的，但是它会在任何语句级别的 AFTER 触发器被触发之前触发。
+
+
+#触发器函数中的特殊变量
+当把一个 PL/pgSQL 函数当作触发器函数调用的时候，系统会在顶层的声明段里自动创建几个特殊变量，比如在之前例子中的 “NEW”、“OLD”、“TG_OP” 变量等。可以使用的变量有如下这些。
+
+NEW：该变量为 INSERT/UPDATE 操作触发的行级触发器中存储的新的数据行，数据类型是 RECORD。在语句级别的触发器里此变量没有分配，DELETE 操作触发的行级触发器中此变量也没有分配。
+OLD：该变量为 UPDATE/DELETE 操作触发的行级触发器中存储的旧数据行，数据类型是 RECORD。在语句级别的触发器里此变量没有分配， INSERT 操作触发的行级触发器中此变量也没有分配。
+TG_NAME：数据类型是 name，该变量包含实际触发的触发器名。
+TG_WHEN: 内容为 BEFORE 或 AFTER 的字符串，用于指定是 BEFORE 触发器还是 AFTER 触发器。
+TG_LEVEL: 内容为 ROW 或 STATEMENT 的字符串用于指定是语句级触发器还是行级触发器。
+TG_OP: 内容为 INSERT、UPDATE、DELETE、TRUNCATE 之一的字符串，用于指定 DML 语句的类型。
+TG_RELID: 触发器所在表的 OID。
+TG_TABLE_NAME: 触发器所在表的名称。
+TG_TABLE_SCHEMA: 触发器所在表的模式。
+TG_NARGS: 在 CREATE TRIGGER 语句里面赋予触发器过程的参数个数。
+TG_ARGV[]:  为 text 类型的一个数组；是 CREATE TRIGGER 语句里的参数。
+
+#删除触发器函数
+DROP FUNCTION fun_name 
+
+#删除触发器
+DROP TRIGGER IF EXISTS 触发器名称 ON 表名称;

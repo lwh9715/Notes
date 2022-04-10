@@ -1,0 +1,75 @@
+PostgreSql
+
+#docker启动postgresql
+	
+	1）依赖拉取
+	docker拉取postgresql文件
+
+	2）创建挂载目录pgdata
+	docker volume create pgdata
+
+	3）docker 启动命令
+	docker run --name postgres \
+	-v /etc/localtime:/etc/localtime:ro \
+	-v pgdata:/var/lib/postgresql/data \
+	-e POSTGRES_PASSWORD=liangwenhui \
+	-p 5432:5432 -d postgres:12.1
+
+
+#初识Postgresql数据库命令
+
+	1）切换系统默认账号
+	su postgres
+
+	2）查看PgSQL版本
+	psql --version
+
+	3）创建数据库
+	createdb hello_pg
+
+	4）删除数据库
+	dropdb hello_pg
+
+	5）查看数据库
+	psql hello_pg
+
+	6)查看数据库列表
+	psql -l
+
+
+#初识Postgresql表命令
+
+	1）创建表
+	create table
+
+	实例：
+	create table sentence (title varchar(255),content text);
+
+	2）删除表
+	drop table sentence
+
+#数据库类型
+
+	1）数据型
+	integer
+	real（浮点型）
+	serial
+	2）文字型
+	char
+	varchar
+	text
+	3）布尔型
+	boolean
+	4）日期型
+	date
+	time
+	timestamp
+	5）特色类型
+	array
+
+
+#Postgresql 事务
+
+	1）begin（开启事务）
+	2）commit（提交事务）
+	3）rollback（回滚事务）
