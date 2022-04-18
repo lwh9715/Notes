@@ -18,3 +18,8 @@
 使用CSS border属性设置边框
 使用CSS padding属性在边框内留出空间
 将CSS margin属性用作边框外的空间 
+
+
+3)#图片与背景颜色设置
+background-repeat: no-repeat;/* 图片按比例显示，其余部分为其他颜色 */
+background-size: contain;/*图片等比例缩放*/
