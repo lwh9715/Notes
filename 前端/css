@@ -23,3 +23,8 @@
 3)#图片与背景颜色设置
 background-repeat: no-repeat;/* 图片按比例显示，其余部分为其他颜色 */
 background-size: contain;/*图片等比例缩放*/
+
+
+4)#文字上下居中
+display: flex;
+align-items: center;
