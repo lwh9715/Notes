@@ -73,3 +73,15 @@ PostgreSql
 	1）begin（开启事务）
 	2）commit（提交事务）
 	3）rollback（回滚事务）
+
+
+
+#SQL值为空时，取固定值（类似三元运算符）
+
+COALESCE(SUM(dc.qty), '0')
+
+
+#ARRAY_AGG聚合函数，就是把多个值合并到一个数组中
+
+
+array_agg(case_label) as case_label
