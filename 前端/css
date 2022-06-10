@@ -28,3 +28,23 @@ background-size: contain;/*图片等比例缩放*/
 4)#文字上下居中
 display: flex;
 align-items: center;
+
+5)#position
+
+position: relative;//相对路径
+position: absolute;//绝对路径
+position: fixed;//固定定位
+
+relative和absolute一起使用可以使absolute内容只在relative范围绝对路径
+
+6)#float
+
+float可以使三个文本在同一行展示，各占三分之一
+box-sizing则可以使添加1px的边框不影响占比
+
+p{
+	float: left;
+	width: 33.3%;
+	border: 1px solid;
+	box-sizing: border-box;
+}
