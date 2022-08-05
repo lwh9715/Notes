@@ -1,0 +1,22 @@
+钉钉开发文档
+
+
+1）获取企业内部应用的access_token
+
+https://oapi.dingtalk.com/gettoken?appkey=dingwjzkt0up1ejktil2&appsecret=IS6n4j22FTdEZ5yGyrxdBUs-zskn_PvB_pROXn2o09NYgYgmERvaT9I2kkp2ZhfS
+
+
+access_token: 0b9132e6058b36e7b5d2634ba065fd62
+
+
+
+
+
+CorpId: ding2bb9458351f19b9b35c2f4657eb6378f
+AgentId: 1572480731
+AppKey: dingwjzkt0up1ejktil2
+AppSecret: IS6n4j22FTdEZ5yGyrxdBUs-zskn_PvB_pROXn2o09NYgYgmERvaT9I2kkp2ZhfS
+jsapiTicket: F2cMkpXUojNtTZGCs7ts7kTaBZPiaHG8RUV7GRhhZ8wzO8TgXY2QXxC6hWVIGv6DzxFRvzYy81Am0A4bck5TXF
+
+
+code： c3d9d6ca5bea3e0e9d310b03ea275630
