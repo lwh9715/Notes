@@ -4,7 +4,7 @@ window
 netstat -ano |findstr 8088
 
 2）查看进程名称
-tasklist |findstr
+tasklist |findstr 进程pid
 
 3）杀进程端口或名称
-taskkill /f /t /im
+taskkill /f /t /im 进程pid
