@@ -82,6 +82,28 @@ COALESCE(SUM(dc.qty), '0')
 
 
 #ARRAY_AGG聚合函数，就是把多个值合并到一个数组中
-
-
 array_agg(case_label) as case_label
+
+
+#查看触发器
+select * from information_schema.triggers;
+
+
+#查看函数
+SELECT * FROM pg_trigger where tgname like 'f%';
+
+
+#触发器及触发器自带函数
+NEW：数据类型是record，在insert、update操作触发时存储新的数据行
+OLD：数据类型是record，在update、delete操作触发时存储旧的数据行
+TG_OP：内容为“INSERT”，“UPDATE”，“DELETE”，“TRUNCATE”，用于指定DML语句类型
+TG_TABLE_NAME：触发器所在表的表名称 TG_SCHEMA_NAME：触发器所在表的模式 
+
+
+
+#字符连接函数
+
+-- pgsql的三种字符链接函数，将多列的字段连接成一条数据
+-- arrary_agg （）  string_agg( )  xmlagg()  
+分别来处理数组，字符串和xml文档。 
+
