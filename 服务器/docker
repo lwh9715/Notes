@@ -290,3 +290,7 @@ java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar -Dserver.port=8179
 42）docker 时间同步问题（挂载服务器本地时间即可）
 
 -v /etc/localtime:/etc/localtime:ro
+
+43) 启动docker 服务命令
+
+docker run -p 8848:8848 --name nacos -d nacos/nacos-server
