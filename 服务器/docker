@@ -230,11 +230,12 @@ docker build -t javaweb:1.0 .
 
 34）Docker 部署 Nacos
 
-docker run --name nacos -d -p 8848:8848 \
---privileged=true \ #使用该参数，container内的root拥有真正的root权限
---restart=always \	#在容器退出时总是重启容器
--e JVM_XMS=512m -e JVM_XMX=512m -e MODE=standalone \
--v   \
+docker run --name nacos -d -p 8848:8848 
+--privileged=true  #使用该参数，container内的root拥有真正的root权限
+--restart=always  #在容器退出时总是重启容器
+-e JVM_XMS=512m -e JVM_XMX=512m -e MODE=standalone 
+-v /mydata/nacos/logs/:/home/nacos/logs 
+-v /mydata/nacos/conf/:/home/nacos/conf 
 bdf60dc2ada3
 
 
@@ -290,3 +291,5 @@ java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar -Dserver.port=8179
 42）docker 时间同步问题（挂载服务器本地时间即可）
 
 -v /etc/localtime:/etc/localtime:ro
+
+
