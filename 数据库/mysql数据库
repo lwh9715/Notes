@@ -94,3 +94,21 @@ SELECT SUM(OrderAmount),ANY_VALUE(DoctorID),ANY_VALUE(DoctorName),ANY_VALUE(Doct
 FROM bus_orders
 WHERE ClinicID = 100052
 GROUP BY DoctorID
+
+
+#用户权限DML
+
+--刪除用戶
+DROP USER 'cdsadmin'@'%';
+--创建用户
+CREATE USER 'cdsadmin'@'%' IDENTIFIED BY 'kL2#dE';
+--授权所有权限给用户
+GRANT ALL PRIVILEGES ON *.* TO 'cdsadmin'@'localhost' WITH GRANT OPTION;
+--授权admin权限给用户
+GRANT RELOAD ON *.* TO 'cdsadmin'@'localhost';
+--刷新
+FLUSH PRIVILEGES;
+--查询用户
+SELECT user FROM mysql.user;
+--查看当前用户权限
+show grants;

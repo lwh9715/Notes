@@ -1,6 +1,6 @@
 PostgreSql
 
-#docker启动postgresql
+1）#docker启动postgresql
 	
 	1）依赖拉取
 	docker拉取postgresql文件
@@ -16,7 +16,7 @@ PostgreSql
 	-p 5432:5432 -d postgres:12.1
 
 
-#初识Postgresql数据库命令
+2）#初识Postgresql数据库命令
 
 	1）切换系统默认账号
 	su postgres
@@ -37,7 +37,7 @@ PostgreSql
 	psql -l
 
 
-#初识Postgresql表命令
+3）#初识Postgresql表命令
 
 	1）创建表
 	create table
@@ -48,7 +48,7 @@ PostgreSql
 	2）删除表
 	drop table sentence
 
-#数据库类型
+4）#数据库类型
 
 	1）数据型
 	integer
@@ -107,3 +107,8 @@ TG_TABLE_NAME：触发器所在表的表名称 TG_SCHEMA_NAME：触发器所在�
 -- arrary_agg （）  string_agg( )  xmlagg()  
 分别来处理数组，字符串和xml文档。 
 
+
+#查看表有没索引
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'fina_arap_link_quote';
