@@ -118,3 +118,7 @@ scp -r /home/nginx.tar root@sjcl.club:/home
 29）linux 添加脚本权限
 
 chmod 777 脚本名称
+
+30）全局查找某个文件目录，并记录在txt文本
+
+sudo find / -type d -name "*nacos*" > nacos_directories.txt

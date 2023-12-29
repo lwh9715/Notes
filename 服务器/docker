@@ -67,6 +67,9 @@ docker run -d -p 3306:3306 --name mysql mysql
 19>查看docker容器日志
 docker logs image-id
 
+查看2016-07-01 后，最新的10条日志
+docker logs --since="2016-07-01" --tail=10 image-id
+
 20>启动mysql镜像  说明:有的镜像启动方法不一
 docker run --name mysql -e MYSQL_ROOT_PASSWORD:123456 -d -p 3306:3306 mysql
 
