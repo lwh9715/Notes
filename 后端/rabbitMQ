@@ -707,7 +707,7 @@ SpringAMQP连接集群，只需要在yaml文件中配置即可
 
 spring:
   rabbitmq:
-    addresses: 120.77.239.151:5672, 120.77.239.151:5672, 120.77.239.151:5672
-    username: guest  #用户名
-    password: guest #密码
+    addresses: 106.13.27.74:5671,42.192.139.14:5672
+    username: root  #用户名
+    password: liangwenhui #密码
     virtual-host: / #虚拟主机
