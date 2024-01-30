@@ -1,0 +1,26 @@
+1）安装yarn
+npm install -g yarn
+
+2）yarn卸载
+npm uninstall yarn -g
+
+3）查看yarn 版本
+yarn -v
+
+4）查看yarn配置
+yarn config list
+
+5）查看当前yarn源
+yarn config get registry
+
+6）查看全局安装过的包
+yarn global list
+
+7）列出已缓存的每个包
+yarn cache list
+
+8）返回全局缓存位置
+yarn cache dir
+
+9）清除缓存
+yarn cache clean
