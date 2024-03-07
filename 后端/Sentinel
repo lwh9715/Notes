@@ -261,3 +261,11 @@ public class SentinelBlockHandler implements BlockExceptionHandler {
 
 
 
+9）docker 启动sentinel 服务命令
+
+#启动sentinel服务
+docker run -d --name sentinel -p 8179:8080 \
+-v /home/sentinel/sentinel-dashboard-1.8.1.jar:/usr/sentinel-dashboard-1.8.1.jar java:8 \
+java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar
+#sentinel服务已启动
+    
