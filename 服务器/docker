@@ -296,3 +296,6 @@ java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar -Dserver.port=8179
 -v /etc/localtime:/etc/localtime:ro
 
 
+43）docker 启动tomcat服务
+
+docker run -d -p 8989:8080 -v /home/webapps:/usr/local/tomcat/webapps tomcat:7

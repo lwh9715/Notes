@@ -15,6 +15,12 @@ PostgreSql
 	-e POSTGRES_PASSWORD=liangwenhui \
 	-p 5432:5432 -d postgres:12.1
 
+	4）开通admin账号
+	CREATE USER admin WITH PASSWORD 'cimc@5432' SUPERUSER;
+
+	5）授权该数据库所有权限
+	GRANT ALL PRIVILEGES ON DATABASE postgres TO admin;
+
 
 2）#初识Postgresql数据库命令
 
