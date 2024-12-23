@@ -1,0 +1,36 @@
+1）服务器迁移目录
+scp -r /home/download root@119.91.237.190:/home/download/
+
+2）Java环境
+tar -zxvf jdk-8u211-linux-x64.tar.gz
+
+3）maven环境
+tar -zxvf apache-maven-3.6.3-bin.tar.gz
+
+4）git环境
+
+# 解压
+tar -zxvf git-2.34.1.tar.gz
+# 编译
+make prefix=/usr/local/git all
+# 安装
+make prefix=/usr/local/git install
+
+5）配置环境
+vi /etc/profile
+
+export PATH=$PATH:/home/download/git/bin
+export MAVEN_HOME=/home/download/apache-maven-3.6.3
+export MAVEN_HOME
+export PATH=$PATH:$MAVEN_HOME/bin
+
+export JAVA_HOME=/home/download/jdk1.8.0_211
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+
+export PYTHON_HOME=/usr/python3.9
+export PATH=${PYTHON_HOME}/bin:$PATH
+
+source /etc/profile
+
+6)

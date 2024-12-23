@@ -71,7 +71,7 @@ docker logs image-id
 docker logs --since="2016-07-01" --tail=10 image-id
 
 20>启动mysql镜像  说明:有的镜像启动方法不一
-docker run --name mysql -e MYSQL_ROOT_PASSWORD:123456 -d -p 3306:3306 mysql
+docker run --name mysql -v /home/mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123456 -d -p 3306:3306 mysql
 
 21>docker如何进入容器  说明:exec方式，终端时分开的，推荐
 docker exec -it image-id /bin/bash
@@ -299,3 +299,5 @@ java -jar -Xms256m -Xmx256m /usr/sentinel-dashboard-1.8.1.jar -Dserver.port=8179
 43）docker 启动tomcat服务
 
 docker run --name tomcat -d -p 8989:8080 -v /home/webapps:/usr/local/tomcat/webapps tomcat:7
+
+docker run --name edi -d -p 81:8080 -v /home/edi:/usr/local/tomcat/webapps tomcat:7

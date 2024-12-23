@@ -134,8 +134,10 @@ SELECT pid,
        state,
        query
 FROM pg_stat_activity
+WHERE STATE ILIKE 'active'
 ORDER BY duration DESC
 limit 30
+
 
 
 #取消进程sql
