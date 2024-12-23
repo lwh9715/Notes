@@ -1,0 +1,17 @@
+cimc-app 命令
+
+
+1）启动钉钉获取个人信息服务
+docker run -d --name backend -p 8080:8080 -v /home/cimc/backend.jar:/usr/backend.jar java:8 java -jar -Xms512m -Xmx512m /usr/backend.jar
+
+
+2）启动nginx
+docker run -d --name nginx -p 80:80 -p 81:81 -p 443:443 -v /home/nginx:/etc/nginx -v /home/h5:/usr/share/nginx/html fa5269854a5e
+
+
+3)启动so项目
+docker run -d --name so -p 8989:8080 -p 443:443 -v /home/conf:/usr/local/tomcat/conf -v /home/webapps:/usr/local/tomcat/webapps --restart=always 9dfd74e6bc2f
+
+
+4）启动工作流
+docker run -d --name so -p 8066:8080 -v /home/webapps:/usr/local/tomcat/webapps --restart=always 9dfd74e6bc2f

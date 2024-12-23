@@ -1,0 +1,59 @@
+shoplaza开发接入
+
+
+1）请求权限
+
+https://cimc-tc.myshoplaza.com/admin/oauth/authorize?client_id=TXdhM6euxhx7QZhFNN1ip2zcvZqH77sN7eBCai2UmLM&scope=read_product read_order read_collection&redirect_uri=https://cimc-tc.myshoplaza.com&response_type=code&state=5
+
+
+
+tips：请求上诉地址获取code和hmac
+https://cimc-tc.myshoplaza.com/?code=b15UQlno4HOEvyllDNDCY9419i3EcP5g-4zXJZothnY&state=5&hmac=2df046ef7635e9b08ca010d8f2a6672684db69af907342736f97588d1bfd8bec&shop=cimc-tc.myshoplaza.com
+
+
+2）确认安装
+
+http://example.com/some/redirect_uri?code=b15UQlno4HOEvyllDNDCY9419i3EcP5g-4zXJZothnY&shop=cimc-tc.myshoplaza.com&hmac=2df046ef7635e9b08ca010d8f2a6672684db69af907342736f97588d1bfd8bec&state=5
+
+
+3）获取永久令牌
+
+https://cimc-tc.myshoplaza.com/admin/oauth/token
+
+
+body参数：（code只生效一次，如需要重置，则重新请求权限）
+
+client_id:TXdhM6euxhx7QZhFNN1ip2zcvZqH77sN7eBCai2UmLM
+client_secret:VIfRKKRJhiMOiSwUc89NwUDq092Enmb8ucsS7pPfRW8
+code:1AmNt16YgoeaRjC_XpZUWa28ZS8T815jNI2nWuG2XKo
+grant_type:authorization_code
+redirect_uri:https://cimc-tc.myshoplaza.com
+
+
+结果：
+{
+	"access_token": "GP2SSOx3UUpf5FafJgiOjoK5K9YuCv46XMJkgaAVgIo",
+	"token_type": "Bearer",
+	"expires_in": 31556952,
+	"refresh_token": "b4aattO3vuLYQcYiVspPC1zMlv1G9h6x9TtmX3ydTYI",
+	"scope": "read_product read_order read_collection",
+	"created_at": 1655172459,
+	"store_id": "366407",
+	"store_name": "cimc-tc",
+	"expires_at": 1686729411,
+	"locale": "zh-CN"
+}
+
+
+4）刷新访问令牌
+
+
+https://cimc-tc.myshoplaza.com/admin/oauth/token
+
+body参数：
+
+client_id:TXdhM6euxhx7QZhFNN1ip2zcvZqH77sN7eBCai2UmLM
+client_secret:VIfRKKRJhiMOiSwUc89NwUDq092Enmb8ucsS7pPfRW8
+refresh_token:b4aattO3vuLYQcYiVspPC1zMlv1G9h6x9TtmX3ydTYI
+grant_type:refresh_token
+redirect_uri:https://cimc-tc.myshoplaza.com

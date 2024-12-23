@@ -1,0 +1,12 @@
+--江苏
+
+select j.nos, COUNT(*) AS jobNo
+from fina_jobs j,
+     fina_arap a
+where j.id = a.jobid
+  and (j.corpid = 70033332274 or j.corpidop = 70033332274)
+  and a.isconfirm = false
+  and a.corpid = 70033332274
+  and j.jobdate < '2022-11-26'
+GROUP BY j.nos, j.jobdate
+HAVING (COUNT(*) > 1)

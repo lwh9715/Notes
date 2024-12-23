@@ -1,0 +1,117 @@
+create function f_ouxuan_zhongji_sync_jobs(_args_tx text) returns text
+    language plpgsql
+as
+$$
+DECLARE
+
+    f_name                     VARCHAR(30);
+    i8_jobsId                  BIGINT;
+    js_business                JSON;
+    js_order                   JSON;
+    js_orderDetails            JSON;
+    js_orderShipperConsignee   JSON;
+    js_orderInvoices           JSON;
+    js_orderAttachServices     JSON;
+    js_packlist                JSON;
+    rc_packlist                RECORD;
+    tx_token                   TEXT;
+    tx_isAsynServerForecast    TEXT;
+    tx_weight                  TEXT;
+    tx_number                  TEXT;
+    tx_productCode             TEXT;
+    tx_customerReferenceNumber TEXT;
+    tx_orderType               TEXT DEFAULT '';
+    tx_error                   TEXT DEFAULT ''; --记录错误信息
+
+BEGIN
+
+    IF (_args_tx IS NULL OR TRIM(_args_tx) = '') THEN
+        tx_error = tx_error || 'Error:参数为空，请检查!' || f_newline();
+        RETURN tx_error;
+    END IF;
+
+    f_name = 'f_ouxuan_zhongji_sync_jobs'; --欧轩信息同步
+    js_business = f_getval(_args_tx, 'business') ::JSONB;
+--  订单基础信息
+    js_order = (js_business #> '{order}') ::JSONB;
+    tx_isAsynServerForecast = COALESCE(js_order ->> 'isAsynServerForecast', '');
+    tx_orderType = COALESCE(js_order ->> 'OrderType', '');
+    tx_customerReferenceNumber = COALESCE(js_order ->> 'customerReferenceNumber', '');
+    tx_weight = COALESCE(js_order ->> 'weight', '');
+    tx_number = COALESCE(js_order ->> 'number', '');
+    tx_productCode = COALESCE(js_order ->> 'productCode', '');
+
+    IF tx_isAsynServerForecast = '0' THEN
+
+--  插入主工作单表
+        i8_jobsId = getid();
+        INSERT INTO fina_jobs(id, jobdate, parentid, inputer, inputtime, customerid, customerabbr, jobtype, remarks, ldtype2)
+        VALUES (i8_jobsId, now(), 0, 'ADMIN', NOW(), COALESCE(js_order ->> 'customerid', '')::BIGINT,
+                (select abbr from sys_corporation where isdelete = false AND id = COALESCE(js_order ->> 'customerid', '')::BIGINT limit 1), 'D', COALESCE(js_order ->> 'order_info', '')::TEXT,
+                tx_orderType);
+
+--  收发件人信息
+        js_orderShipperConsignee = (js_business #> '{orderShipperConsignee}') ::JSONB;
+
+--  插入电商工作单表
+        INSERT INTO bus_commerce (id, jobid, refnum, bweight, pkgnum, productname) VALUES (getid(), i8_jobsId, tx_customerReferenceNumber, tx_weight, tx_number, tx_productCode);
+
+--  货物信息
+        js_orderDetails = (js_business #> '{orderDetails}') ::JSONB;
+
+        FOR rc_packlist IN (SELECT * FROM json_array_elements(js_orderDetails))
+            LOOP
+                js_packlist = (rc_packlist.value)::JSONB;
+                INSERT INTO bus_packlist (id, linkid, cbmlength, cbmwidth, cbmheight, factoryname, factorynamee, materialnamec, materialnamee, modelnamec, modelnamee, usagenamec, usagenamee)
+                VALUES (getid(), tx_customerReferenceNumber,
+                        COALESCE(js_packlist ->> 'length', '')::SMALLINT,
+                        COALESCE(js_packlist ->> 'width', '')::SMALLINT,
+                        COALESCE(js_packlist ->> 'height', '')::SMALLINT,
+                        COALESCE(js_packlist ->> 'goodsName', '')::TEXT,
+                        COALESCE(js_packlist ->> 'enname', '')::TEXT,
+                        COALESCE(js_packlist ->> 'material', '')::TEXT,
+                        COALESCE(js_packlist ->> 'material', '')::TEXT,
+                        COALESCE(js_packlist ->> 'model', '')::TEXT,
+                        COALESCE(js_packlist ->> 'model', '')::TEXT,
+                        COALESCE(js_packlist ->> 'use', '')::TEXT,
+                        COALESCE(js_packlist ->> 'use', '')::TEXT);
+            END LOOP;
+
+--  发票信息
+        js_orderInvoices = (js_business #> '{orderInvoices}') ::JSONB;
+--  附加信息
+        js_orderAttachServices = (js_business #> '{orderAttachServices}') ::JSONB;
+        RETURN tx_orderType;
+
+-- 已推送工作单 更新内容
+    ELSEIF tx_isAsynServerForecast = '1' THEN
+
+
+        --  收发件人信息
+        js_orderShipperConsignee = (js_business #> '{orderShipperConsignee}') ::JSONB;
+
+        UPDATE fina_jobs
+        SET jobdate      = NOW()
+          , refno        = tx_customerReferenceNumber
+          , customerid   = COALESCE(js_order ->> 'customerid', '')::BIGINT
+          , customerabbr = (select abbr from sys_corporation where isdelete = false AND id = COALESCE(js_order ->> 'customerid', '')::BIGINT limit 1)
+          , isshipping   = TRUE
+          , ldtype2      = 'F'
+          , updater      = 'f_ouxuan_zhongji_sync_jobs'
+          , updatetime   = now()
+        WHERE isdelete = false
+          and id = i8_jobsId;
+
+        --  货物信息
+        js_orderDetails = (js_business #> '{orderDetails}') ::JSONB;
+
+
+    END IF;
+
+    RETURN '';
+
+END
+$$;
+
+alter function f_ouxuan_zhongji_sync_jobs(text) owner to admin;
+

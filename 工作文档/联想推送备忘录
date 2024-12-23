@@ -1,0 +1,66 @@
+联想推送备忘录
+
+1）查看推送日志
+
+SELECT *
+FROM sys_lastinglog
+where inputer ILIKE 'ftSubscribe_busshippingBean'
+  AND logdesc ilike '%PIDU4156416%'
+order by logtime desc
+LIMIT 5
+
+2）排查是否没同步so号码
+
+SELECT sono, inputtime, srctype
+FROM bus_ship_booking
+where srctype = 'FTWR'
+  AND isdelete = false
+  AND inputtime IS NOT NULL
+  AND sono ILIKE 'SLSSKINAC192'
+ORDER BY inputtime DESC
+LIMIT 500
+
+
+3）模拟数据插入轨迹
+
+INSERT INTO bus_ship_book_cnt (id, linkid, linktbl, refno, piece, cntype, cntno, grswgt, sealno, jobid, inputer, inputime, updater, updatetime, htime, stime)
+VALUES (getid(), 1822145352274, null, 'SLSSKINAC191', null, '', 'TCNU7052275', '', '', 1775707952274, 'amos', null, null, null, null, null);
+
+INSERT INTO bus_ship_container_track (id, linkid, linktbl, refno, statusc, statuse, locationc, locatione, dealdate, ves, voy, sts1code, inputer, inputime, updater, updatetime, isemailsend, srctype, stscode)
+VALUES (getid(), 1822393032274, null, 'TCNU7052275', null, null, null, null, '2024-05-17 01:02:00.000000', '', '', 'STSP', 'amos phrase', '2024-05-17 01:02:00.000000', null, null, null, 'FTWR', null);
+
+INSERT INTO bus_ship_container_track (id, linkid, linktbl, refno, statusc, statuse, locationc, locatione, dealdate, ves, voy, sts1code, inputer, inputime, updater, updatetime, isemailsend, srctype, stscode)
+VALUES (getid(), 1822393032274, null, 'TCNU7052275', null, null, null, null, '2024-05-31 01:02:00.000000', '', '', 'STCS', 'amos phrase', '2024-05-31 01:02:00.000000', null, null, null, 'FTWR', null);
+
+
+4）如是船东船，需要更新pickup日期，则修改海运表
+
+select pink_up_time
+from bus_shipping
+where jobid = 1790226272274;
+
+update bus_shipping
+set pink_up_time = '2024-05-31T00:00:00+08:00'
+where jobid = 1790226272274;
+
+update bus_shipping
+set ata = '2024-05-31T00:00:00+08:00'
+where jobid = 1790226272274;
+
+
+5）事件导致原因还原，如下同步so，柜号等信息的函数触发异常；导致bus_ship_booking该表无存储so数据；在推送联想时，关联不到数据 查询异常导致不错
+
+SELECT f_auto_edi_sync_common('type=0');
+
+6）相关的函数
+
+f_zhongji_Lenovo_sync_jobs_trace
+
+7）推送状态
+
+--pick up date      AF
+--ATD   F
+--ETA   E
+--ATA   UV
+--pol   AE
+--pod   A

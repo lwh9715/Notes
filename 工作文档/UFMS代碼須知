@@ -1,0 +1,9 @@
+UFMS代碼須知
+
+1）类似于@AutoWrite引入
+
+DaoIbatisTemplate daoIbatisTemplate = (DaoIbatisTemplate) AppUtil.getBeanFromSpringIoc("daoIbatisTemplate");
+
+String sql = "INSERT INTO sys_log (id,inputer,logtime,logdesc,isdelete,logtype) VALUES (getid(),'insertLog',now(),'"+logdesc.toString()+"','f','DEBUG');";		
+		
+daoIbatisTemplate.updateWithUserDefineSql(sql);

@@ -1,0 +1,15 @@
+后端接口服务：
+
+1）后台启动命令
+
+javaw -jar springboot-edi.jar
+
+2）关闭后台服务命令
+
+taskkill -f -t -im javaw.exe
+
+前端页面服务：
+
+1）手动启动Tomcat服务
+
+apache-tomcat-7.0.88\bin\startup.bat
