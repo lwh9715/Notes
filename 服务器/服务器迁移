@@ -19,7 +19,7 @@ make prefix=/usr/local/git install
 5）配置环境
 vi /etc/profile
 
-export PATH=$PATH:/home/download/git/bin
+export PATH=$PATH:/usr/local/git/bin
 export MAVEN_HOME=/home/download/apache-maven-3.6.3
 export MAVEN_HOME
 export PATH=$PATH:$MAVEN_HOME/bin
