@@ -1,0 +1,13 @@
+ollama AI
+
+1）安装 deepseek 版本
+
+ollama run deepseek-r1:8b
+
+2）查看已安装目录
+
+ollama list
+
+3）删除已安装的版本模型
+
+ollama rm deepseek-r1:8b
