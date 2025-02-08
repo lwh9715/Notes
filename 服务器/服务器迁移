@@ -33,4 +33,6 @@ export PATH=${PYTHON_HOME}/bin:$PATH
 
 source /etc/profile
 
-6)
+6)迁移nginx
+
+scp -r /usr/share/nginx root@119.91.237.190:/home/market/
